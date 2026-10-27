@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ma Collection Pokémon</title>
+<style>
+  :root { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif; color: #1e293b; background: #f1f5f9; margin: 0; }
+  * { box-sizing: border-box; }
+  header { background: linear-gradient(90deg,#4f46e5,#9333ea); color: #fff; padding: 18px 16px; }
+  .hwrap { max-width: 860px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+  h1 { font-size: 1.4rem; margin: 0; }
+  .sub { color: rgba(255,255,255,.85); font-size: .85rem; margin-top: 2px; }
+  .hbtns { display: flex; gap: 8px; flex-wrap: wrap; }
+  main { max-width: 860px; margin: 0 auto; padding: 18px 16px 60px; }
+  .card { background: #fff; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 16px; margin-bottom: 14px; }
+  h2 { font-size: 1.05rem; margin: 0 0 6px; }
+  .muted { color: #64748b; font-size: .85rem; margin: 0 0 12px; }
+  input[type=text], input[type=number], select { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: .9rem; font-family: inherit; background: #fff; }
+  input:focus, select:focus { outline: 2px solid #a5b4fc; border-color: #6366f1; }
+  .btn { padding: 8px 14px; border-radius: 8px; border: none; font-size: .88rem; font-weight: 500; cursor: pointer; font-family: inherit; }
+  .btn.primary { background: #4f46e5; color: #fff; } .btn.primary:hover { background: #4338ca; }
+  .btn.ghost { background: rgba(255,255,255,.15); color: #fff; } .btn.ghost:hover { background: rgba(255,255,255,.28); }
+  .btn.light { background: #fff; color: #4f46e5; } .btn.light:hover { background: #eef2ff; }
+  .btn.green { background: #059669; color: #fff; } .btn.green:hover { background: #047857; }
+  .btn.line { background: #fff; border: 1px solid #cbd5e1; color: #334155; } .btn.line:hover { background: #f8fafc; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .note { background: #eef2ff; color: #4f46e5; padding: 8px 12px; border-radius: 8px; font-size: .85rem; margin: 10px 0; }
+  .err { color: #dc2626; font-size: .85rem; margin: 10px 0; }
+  .okmsg { background: #d1fae5; color: #065f46; padding: 8px 12px; border-radius: 8px; font-size: .85rem; margin-bottom: 12px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 12px; text-align: center; }
+  .stat .lab { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: #64748b; }
+  .stat .val { font-size: 1.15rem; font-weight: 700; margin-top: 2px; }
+  .stat .val.green { color: #059669; }
+  .item { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 10px 12px; margin-bottom: 10px; display: flex; gap: 12px; align-items: center; }
+  .item img { width: 56px; height: 80px; object-fit: cover; border-radius: 8px; background: #e2e8f0; flex-shrink: 0; }
+  .item .info { flex: 1; min-width: 0; }
+  .item .nm { font-weight: 600; }
+  .badge { display: inline-block; font-size: .68rem; border-radius: 99px; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
+  .badge.qty { background: #f1f5f9; color: #334155; }
+  .badge.cond { background: #eef2ff; color: #4f46e5; }
+  .badge.holo { background: linear-gradient(90deg,#fde68a,#fef3c7); color: #92400e; font-weight: 600; }
+  .meta { color: #64748b; font-size: .75rem; margin-top: 2px; }
+  .pricebox { text-align: right; flex-shrink: 0; }
+  .price { font-weight: 700; color: #059669; }
+  .xbtn { border: 1px solid #e2e8f0; background: #fff; border-radius: 6px; padding: 3px 8px; cursor: pointer; font-size: .78rem; margin-left: 4px; }
+  .xbtn.del { border-color: #fecaca; color: #dc2626; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 12px; }
+  .rbtn { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0; cursor: pointer; overflow: hidden; text-align: left; }
+  .rbtn:hover { border-color: #818cf8; box-shadow: 0 2px 8px rgba(99,102,241,.2); }
+  .rbtn img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
+  .rbtn .cap { padding: 6px 8px; font-size: .72rem; }
+  .spin { display: inline-block; width: 15px; height: 15px; border: 2px solid #cbd5e1; border-top-color: #6366f1; border-radius: 50%; animation: sp .7s linear infinite; vertical-align: -2px; margin-right: 6px; }
+  @keyframes sp { to { transform: rotate(360deg); } }
+  .filters .row { margin-bottom: 8px; }
+  footer { max-width: 860px; margin: 0 auto; padding: 0 16px 30px; font-size: .72rem; color: #94a3b8; }
+  code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+  .empty { text-align: center; color: #64748b; padding: 36px 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <div>
+      <h1>⚡ Ma Collection Pokémon</h1>
+      <div class="sub" id="subTitle"></div>
+    </div>
+    <div class="hbtns" id="hbtns"></div>
+  </div>
+</header>
+<main id="main"></main>
+<footer id="footer"></footer>
+
+<script>
+"use strict";
+// ============================================================
+// Application autonome : scanner / saisir des cartes Pokémon,
+// enregistrer la collection et rafraîchir les cotes à la demande.
+// ============================================================
+const API = "https://api.pokemontcg.io/v2";
+const STORAGE_KEY = "pkmn-collection-v1";
+const CONDITIONS = ["Mint","Near Mint","Excellent","Bonne","Correcte","Abîmée"];
+
+// ---------- Dictionnaire français → anglais ----------
+const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const FR_POKE = {
+  bulbizarre:"Bulbasaur", herbizarre:"Ivysaur", florizarre:"Venusaur",
+  salameche:"Charmander", reptincel:"Charmeleon", dracaufeu:"Charizard",
+  carapuce:"Squirtle", carabaffe:"Wartortle", tortank:"Blastoise",
+  chenipan:"Caterpie", chrysacier:"Metapod", papilusion:"Butterfree",
+  aspicot:"Weedle", coconfort:"Kakuna", dardargnan:"Beedrill",
+  roucool:"Pidgey", roucoups:"Pidgeotto", roucarnage:"Pidgeot",
+  rattata:"Rattata", rattatac:"Raticate", piafabec:"Spearow", rapasdepic:"Fearow",
+  abo:"Ekans", arbok:"Arbok", pikachu:"Pikachu", raichu:"Raichu",
+  sabelette:"Sandshrew", sablaireau:"Sandslash",
+  nidoran:"Nidoran", nidorina:"Nidorina", nidoqueen:"Nidoqueen",
+  nidorino:"Nidorino", nidoking:"Nidoking",
+  melofee:"Clefairy", melodelfe:"Clefable", goupix:"Vulpix", feunard:"Ninetales",
+  rondoudou:"Jigglypuff", grodoudou:"Wigglytuff",
+  nosferapti:"Zubat", nosferalto:"Golbat",
+  mystherbe:"Oddish", ortide:"Gloom", rafflesia:"Vileplume",
+  paras:"Paras", parasect:"Parasect", mimitoss:"Venonat", aeromite:"Venomoth",
+  taupiqueur:"Diglett", triopikeur:"Dugtrio", miaouss:"Meowth", persian:"Persian",
+  psykokwak:"Psyduck", akwakwak:"Golduck", ferasinge:"Mankey", colossinge:"Primeape",
+  chetiflor:"Bellsprout", boustiflor:"Weepinbell", empiflor:"Victreebel",
+  tentacool:"Tentacool", tentacruel:"Tentacruel",
+  racaillou:"Geodude", gravalanch:"Graveler", grolem:"Golem",
+  ponyta:"Ponyta", galopa:"Rapidash", ramoloss:"Slowpoke", flagadoss:"Slowbro",
+  magneti:"Magnemite", magneton:"Magneton",
+  canarticho:"Farfetchd", doduo:"Doduo", dodrio:"Dodrio",
+  otaria:"Seel", dewgong:"Dewgong", tadmorv:"Grimer", grotadmorv:"Muk",
+  kokiyas:"Shellder", crustabri:"Cloyster",
+  fantominus:"Gastly", spectrum:"Haunter", ectoplasma:"Gengar",
+  onix:"Onix", soporifik:"Drowzee", hypnomade:"Hypno",
+  krabby:"Krabby", krabboss:"Kingler", voltorbe:"Voltorb", electrode:"Electrode",
+  noeunoeuf:"Exeggcute", noadkoko:"Exeggutor",
+  osselait:"Cubone", ossatueur:"Marowak",
+  kicklee:"Hitmonlee", tygnon:"Hitmonchan", excelangue:"Lickitung",
+  smogo:"Koffing", smogogo:"Weezing", rhinocorne:"Rhyhorn", rhinoferos:"Rhydon",
+  leveinard:"Chansey", saquedeneu:"Tangela", kangourex:"Kangaskhan",
+  hypotelec:"Horsea", hypocean:"Seadra",
+  poissirene:"Goldeen", poissoroy:"Seaking", stari:"Staryu", staross:"Starmie",
+  "m. mime":"Mr. Mime", insecteur:"Scyther",
+  leviator:"Gyarados", lokhlass:"Lapras", metamorph:"Ditto",
+  evoli:"Eevee", aquali:"Vaporeon", voltali:"Jolteon", pyroli:"Flareon", porygon:"Porygon",
+  amonita:"Omanyte", amonistar:"Omastar", kabuto:"Kabuto", kabutops:"Kabutops",
+  ptera:"Aerodactyl", ronflex:"Snorlax",
+  artikodin:"Articuno", electhor:"Zapdos", sulfura:"Moltres",
+  minidraco:"Dratini", draco:"Dragonair", dracolosse:"Dragonite",
+  mewtwo:"Mewtwo", mew:"Mew",
+  germignon:"Chikorita", macronium:"Bayleef", meganium:"Meganium",
+  hericendre:"Cyndaquil", feurisson:"Quilava", typhlosion:"Typhlosion",
+  kaiminus:"Totodile", crocogil:"Croconaw", aligatueur:"Feraligatr",
+  fouinette:"Sentret", fouinar:"Furret", hoothoot:"Hoothoot", noarfang:"Noctowl",
+  coxy:"Ledyba", coxyclaque:"Ledian", axoloto:"Wooper", maraiste:"Quagsire",
+  mentali:"Espeon", noctali:"Umbreon", cornebre:"Murkrow", roigada:"Slowking",
+  farfuret:"Sneasel", cizayox:"Scizor", elekid:"Elekid", magby:"Magby",
+  granbull:"Granbull", cerfrousse:"Stantler", debugant:"Tyrogue",
+  tournegrin:"Sunkern", heliatronc:"Sunflora", capumain:"Aipom", queulorior:"Smeargle",
+  massko:"Treecko", arcko:"Grovyle", jungko:"Sceptile",
+  poussifeu:"Torchic", galifeu:"Combusken", brasegali:"Blaziken",
+  gobou:"Mudkip", flobio:"Marshtomp", laggron:"Swampert",
+  kirlia:"Kirlia", gardevoir:"Gardevoir", draby:"Bagon",
+  groudon:"Groudon", kyogre:"Kyogre", rayquaza:"Rayquaza",
+  latias:"Latias", latios:"Latios", jirachi:"Jirachi", deoxys:"Deoxys",
+  tiplouf:"Piplup", prinplouf:"Prinplup", pingoleon:"Empoleon",
+  lucario:"Lucario", garchomp:"Garchomp",
+  dialga:"Dialga", palkia:"Palkia", giratina:"Giratina",
+  heatran:"Heatran", cresselia:"Cresselia", darkrai:"Darkrai", arceus:"Arceus",
+  reshiram:"Reshiram", zekrom:"Zekrom", kyurem:"Kyurem",
+  amphinobi:"Greninja", xerneas:"Xerneas", yveltal:"Yveltal",
+  brindibou:"Rowlet", effleche:"Dartrix", archeduc:"Decidueye",
+  flamiaou:"Litten", matoufeu:"Torracat", felinferno:"Incineroar",
+  otaquin:"Popplio", otarlet:"Brionne", primarina:"Primarina",
+  mimiqui:"Mimikyu", zeraora:"Zeraora",
+  ouistempo:"Grookey", badabouin:"Thwackey", gorythmic:"Rillaboom",
+  flambino:"Scorbunny", lapyro:"Raboot", pyrobut:"Cinderace",
+  larmeleon:"Sobble", arrozard:"Drizzile", intereon:"Inteleon",
+  zacian:"Zacian", zamazenta:"Zamazenta", eternatus:"Eternatus",
+  viperoue:"Snivy", vipelierre:"Snivy", lianjoue:"Servine", majaspic:"Serperior",
+  gruikui:"Tepig", grotichon:"Pignite", roitiflor:"Emboar",
+  moustillon:"Oshawott", mateloutre:"Dewott", clamiral:"Samurott",
+  zorua:"Zorua", zoroark:"Zoroark", emolga:"Emolga",
+  mascaiman:"Sandile", escroco:"Krokorok", krocorible:"Krookodile",
+  solochi:"Deino", diamat:"Zweilous", trioxhydre:"Hydreigon",
+  couaneton:"Ducklett", lakmegarde:"Swanna",
+  furaiglon:"Rufflet", gueriaigle:"Braviary",
+  frigodo:"Cryogonal", golemastoc:"Golurk",
+  cobaltium:"Cobalion", terrakium:"Terrakion", viridium:"Virizion",
+  victini:"Victini", keldeo:"Keldeo", meloetta:"Meloetta", genesect:"Genesect",
+  marisson:"Chespin", bagonene:"Quilladin", bouldeneu:"Chesnaught",
+  feunnec:"Fennekin", roussil:"Braixen", goupelin:"Delphox",
+  grenousse:"Froakie", croaporal:"Frogadier",
+  passerouge:"Fletchling", braisillon:"Fletchinder", flambusard:"Talonflame",
+  ceribou:"Cherubi", ceriflor:"Cherrim",
+  funecire:"Litwick", melancolux:"Lampent", lugulabre:"Chandelure",
+  nymphali:"Sylveon",
+  monorpale:"Honedge", dimocles:"Doublade", exagide:"Aegislash",
+  tarsal:"Ralts", rhinastoc:"Rhyperior", mammochon:"Mamoswine",
+  noctunoir:"Dusknoir", tenalice:"Shiftry",
+  feuforeve:"Misdreavus", magireve:"Mismagius",
+  motisma:"Rotom", pyonille:"Larvesta", pyrax:"Volcarona",
+  demolosse:"Houndoom", malosse:"Houndour",
+};
+const FR_SETS = {
+  "edition de base":"Base", "base":"Base", "jungle":"Jungle", "fossile":"Fossil",
+  "equipe rocket":"Team Rocket", "rocket":"Team Rocket",
+  "gym heroes":"Gym Heroes", "gym challenge":"Gym Challenge",
+  "neo genese":"Neo Genesis", "neo decouverte":"Neo Discovery",
+  "neo revolution":"Neo Revelation", "neo destin":"Neo Destiny",
+  "expedition":"Expedition", "aquapolis":"Aquapolis", "skyridge":"Skyridge",
+  "ex rubis saphir":"EX Ruby & Sapphire", "ex":"EX",
+  "team magma":"Team Magma", "team aqua":"Team Aqua",
+  "plage des secrets":"Hidden Fates",
+  "epee et bouclier":"Sword & Shield", "epée et bouclier":"Sword & Shield",
+  "vif argent":"Silver Tempest", "origines antiques":"Ancient Origins",
+  "tumulte astral":"Astral Radiance", "brillant stars":"Brilliant Stars",
+  "couronnement":"Crown Zenith", "obsidienne":"Obsidian Flames",
+  "paradoxe temporel":"Temporal Forces", "destinees de paldea":"Paldean Fates",
+};
+
+function translateQuery(raw) {
+  const n = norm(raw);
+  if (FR_POKE[n]) return FR_POKE[n];
+  for (const fr of Object.keys(FR_POKE)) {
+    if (n === fr || n.startsWith(fr + " ")) return FR_POKE[fr] + raw.slice(fr.length);
+  }
+  const m = n.match(/^(.+?)\s+(edition de base|base|jungle|fossile|equipe rocket|neo genese|neo decouverte|neo revolution|neo destin)$/);
+  if (m) {
+    const namePart = FR_POKE[m[1]] || m[1];
+    const setPart = FR_SETS[m[2]];
+    if (setPart) return 'name:"' + namePart + '" set.name:"' + setPart + '"';
+  }
+  if (n.includes("set.name:")) {
+    let out = raw, done = false;
+    for (const fr of Object.keys(FR_SETS)) {
+      const re = new RegExp('set.name:"?' + fr + '"?', "i");
+      if (re.test(out)) { out = out.replace(re, 'set.name:"' + FR_SETS[fr] + '"'); done = true; }
+    }
+    return done ? out : null;
+  }
+  return null;
+}
+function suggestFr(q, max) {
+  const n = norm(q); if (n.length < 3) return [];
+  const out = [];
+  for (const fr of Object.keys(FR_POKE)) {
+    if (fr !== n && (fr.startsWith(n.slice(0, 3)) || (n.length >= 4 && fr.includes(n)))) {
+      out.push(fr + " (" + FR_POKE[fr] + ")");
+      if (out.length >= (max || 3)) break;
+    }
+  }
+  return [...new Set(out)];
+}
+
+// ---------- Connexion API (direct puis proxys en repli) ----------
+const PROXY_ROUTES = [
+  { label: "directe", wrap: (u) => u },
+  { label: "proxy allorigins", wrap: (u) => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) },
+  { label: "proxy codetabs", wrap: (u) => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u) },
+  { label: "proxy jina", wrap: (u) => "https://r.jina.ai/" + u },
+];
+let lastRoute = null;
+async function fetchJson(url) {
+  let lastErr = null;
+  for (const route of PROXY_ROUTES) {
+    try {
+      const res = await fetch(route.wrap(url));
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const txt = await res.text();
+      const start = txt.indexOf("{");
+      if (start === -1) throw new Error("JSON illisible");
+      const json = JSON.parse(start === 0 ? txt : txt.slice(start));
+      lastRoute = route.label;
+      return json;
+    } catch (e) { lastErr = e; }
+  }
+  throw new Error("Connexion à l'API Pokemon TCG impossible (" + (lastErr && lastErr.message ? lastErr.message : "erreur réseau") + "). Vérifiez votre connexion internet et réessayez.");
+}
+async function apiSearch(query) {
+  const q = encodeURIComponent(query);
+  const json = await fetchJson(API + "/cards?q=" + q + "&pageSize=40&orderBy=set.releaseDate:desc");
+  if (!json || !Array.isArray(json.data)) throw new Error("Réponse API inattendue.");
+  return json.data;
+}
+async function apiGetCard(id) {
+  try {
+    const json = await fetchJson(API + "/cards/" + encodeURIComponent(id));
+    return (json && json.data) || null;
+  } catch (e) { return null; }
+}
+const VARIANT_LABELS = { normal: "Normal", holofoil: "Holo", reverseHolofoil: "Reverse Holo" };
+const variantLabel = (k) => VARIANT_LABELS[k] || k;
+function availableVariants(card) {
+  const tp = (card && card.tcgplayer && card.tcgplayer.prices) || {};
+  return Object.keys(tp)
+    .filter((k) => tp[k] && typeof tp[k].market === "number")
+    .map((k) => ({ key: variantLabel(k), price: tp[k].market }));
+}
+function extractPrice(card, variant) {
+  const tp = (card && card.tcgplayer && card.tcgplayer.prices) || {};
+  if (variant) {
+    for (const k of Object.keys(tp)) {
+      if (variantLabel(k) === variant && typeof tp[k].market === "number") return { market: tp[k].market, source: "TCGPlayer market" };
+    }
+  }
+  for (const k of Object.keys(tp)) if (typeof tp[k].market === "number") return { market: tp[k].market, source: "TCGPlayer market" };
+  const cm = card && card.cardmarket && card.cardmarket.prices;
+  if (cm && typeof cm.averageSellPrice === "number") return { market: cm.averageSellPrice, source: "CardMarket moyenne" };
+  if (cm && typeof cm.trendPrice === "number") return { market: cm.trendPrice, source: "CardMarket tendance" };
+  return { market: null, source: "" };
+}
+
+// ---------- État ----------
+let cards = [];
+try {
+  cards = (JSON.parse(localStorage.getItem(STORAGE_KEY)) || []).map((c) => Object.assign({ variant: "Normal" }, c));
+} catch (e) { cards = []; }
+function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cards)); } catch (e) {} }
+const ui = {
+  tab: "list", search: "", results: [], searching: false, error: null, note: null,
+  pending: null, pendingVariants: [], photo: null,
+  sortBy: "added", sortDesc: false, filterText: "", filterSet: "all", hideUnpriced: false,
+  refreshing: false, refreshMsg: null, busyKeys: new Set(),
+};
+
+// ---------- Utilitaires ----------
+const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const fmtPrice = (v) => (v == null ? "—" : v.toFixed(2) + " $");
+const fmtDate = (iso) => iso ? new Date(iso).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : "—";
+const key = (c) => c.id + "|" + c.variant;
+
+function compressImage(file, maxSize, cb) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const sc = Math.min(1, maxSize / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      cb(c.toDataURL("image/jpeg", 0.75));
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ---------- Actions ----------
+async function runSearch(ev) {
+  if (ev) ev.preventDefault();
+  const q = document.getElementById("searchInput").value.trim();
+  if (!q) return;
+  ui.search = q; ui.searching = true; ui.error = null; ui.note = null; ui.results = [];
+  render();
+  try {
+    const fr = translateQuery(q);
+    const build = (s) => (/[:"]/.test(s) ? s : 'name:"' + s + '"');
+    const attempts = [];
+    if (fr && fr.toLowerCase() !== q.toLowerCase()) attempts.push({ q: fr, label: "Recherche traduite : « " + fr + " » (depuis « " + q + " »)" });
+    attempts.push({ q: q, label: null });
+    let r = [], used = null;
+    for (const a of attempts) {
+      r = await apiSearch(build(a.q));
+      if (r.length > 0) { used = a.label; break; }
+    }
+    ui.results = r; ui.note = used;
+    if (r.length === 0) {
+      const sg = suggestFr(q);
+      ui.error = "Aucune carte trouvée pour « " + q + " »." + (sg.length ? " Vouliez-vous dire : " + sg.join(", ") + " ?" : "");
+    }
+  } catch (e) { ui.error = e.message || "Erreur réseau"; }
+  ui.searching = false;
+  render();
+}
+function pickResult(id) {
+  const apiCard = ui.results.find((r) => r.id === id);
+  if (!apiCard) return;
+  const variants = availableVariants(apiCard);
+  const def = variants.find((v) => v.key === "Normal") || variants[0];
+  const p = def ? { market: def.price, source: "TCGPlayer market" } : extractPrice(apiCard);
+  ui.pendingVariants = variants;
+  ui.pending = {
+    id: apiCard.id, variant: def ? def.key : "Normal",
+    name: apiCard.name, set: (apiCard.set && apiCard.set.name) || "?",
+    number: apiCard.number || "", rarity: apiCard.rarity || "",
+    imageUrl: (apiCard.images && apiCard.images.large) || null,
+    imageSmall: (apiCard.images && apiCard.images.small) || null,
+    photo: ui.photo, qty: 1, condition: "Near Mint",
+    price: p.market, priceDate: p.market != null ? new Date().toISOString() : null,
+    priceSource: p.source || null,
+  };
+  render();
+}
+function changePendingVariant(v) {
+  const pv = ui.pendingVariants.find((x) => x.key === v);
+  ui.pending.variant = v;
+  ui.pending.price = pv ? pv.price : null;
+  ui.pending.priceDate = (pv && pv.price != null) ? new Date().toISOString() : null;
+  ui.pending.priceSource = pv ? "TCGPlayer market" : null;
+  render();
+}
+function cancelPending() { ui.pending = null; ui.pendingVariants = []; render(); }
+function clearPhoto() { ui.photo = null; render(); }
+function switchTab(t) { ui.tab = t; render(); }
+function confirmAdd() {
+  if (!ui.pending) return;
+  ui.pending.qty = Math.max(1, parseInt(document.getElementById("pQty").value, 10) || 1);
+  ui.pending.condition = document.getElementById("pCond").value;
+  const i = cards.findIndex((c) => c.id === ui.pending.id && c.variant === ui.pending.variant);
+  if (i >= 0) cards[i].qty += ui.pending.qty;
+  else cards.push(ui.pending);
+  save();
+  ui.pending = null; ui.pendingVariants = []; ui.photo = null; ui.results = []; ui.tab = "list";
+  render();
+}
+function removeCard(k) {
+  cards = cards.filter((c) => key(c) !== k);
+  save(); render();
+}
+async function refreshCard(c) {
+  const k = key(c);
+  ui.busyKeys.add(k); render();
+  const fresh = await apiGetCard(c.id);
+  const i = cards.findIndex((x) => key(x) === k);
+  if (fresh && i >= 0) {
+    const p = extractPrice(fresh, c.variant);
+    cards[i].price = p.market;
+    cards[i].priceDate = p.market != null ? new Date().toISOString() : null;
+    cards[i].priceSource = p.source || null;
+    save();
+  }
+  ui.busyKeys.delete(k); render();
+}
+function refreshCardByKey(k) {
+  const c = cards.find((x) => key(x) === k);
+  if (c) refreshCard(c);
+}
+async function refreshAll() {
+  if (!cards.length || ui.refreshing) return;
+  ui.refreshing = true; ui.refreshMsg = null; render();
+  let updated = 0;
+  for (let i = 0; i < cards.length; i += 4) {
+    await Promise.all(cards.slice(i, i + 4).map(async (c) => {
+      const fresh = await apiGetCard(c.id);
+      if (fresh) {
+        const p = extractPrice(fresh, c.variant);
+        if (p.market != null) {
+          c.price = p.market; c.priceDate = new Date().toISOString(); c.priceSource = p.source;
+          updated++;
+        }
+      }
+    }));
+    save(); render();
+  }
+  ui.refreshing = false;
+  ui.refreshMsg = "Cotes actualisées : " + updated + "/" + cards.length + " carte(s).";
+  render();
+}
+function exportCSV() {
+  const headers = ["Nom","Édition","Numéro","Rareté","Variante","État","Quantité","Cote ($)","Cote × Qté ($)","Source","Dernière mise à jour","ID API","Photo perso"];
+  const e = (v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+  const total = cards.reduce((s, c) => s + (c.price || 0) * c.qty, 0);
+  const totalCards = cards.reduce((s, c) => s + c.qty, 0);
+  const rows = cards.map((c) => [
+    e(c.name), e(c.set), e(c.number), e(c.rarity), e(c.variant), e(c.condition), c.qty,
+    c.price != null ? c.price.toFixed(2) : "", c.price != null ? (c.price * c.qty).toFixed(2) : "",
+    e(c.priceSource), e(c.priceDate), e(c.id), c.photo ? "oui" : "non",
+  ].join(";"));
+  const csv = "\uFEFF" + headers.join(";") + "\n" + rows.join("\n") + "\n" + ["TOTAL","","","","","",totalCards,"",total.toFixed(2),"","","","",""].join(";");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "collection-pokemon-" + new Date().toISOString().slice(0, 10) + ".csv";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+// ---------- Affichage ----------
+function render() {
+  const total = cards.reduce((s, c) => s + (c.price || 0) * c.qty, 0);
+  const totalCards = cards.reduce((s, c) => s + c.qty, 0);
+  const pricedCount = cards.filter((c) => c.price != null).length;
+  document.getElementById("subTitle").textContent =
+    totalCards + " carte" + (totalCards > 1 ? "s" : "") + " · Valeur estimée : " + fmtPrice(total);
+  document.getElementById("hbtns").innerHTML =
+    '<button class="btn ghost" onclick="refreshAll()" ' + (ui.refreshing || !cards.length ? "disabled" : "") + '>' +
+    (ui.refreshing ? "Actualisation…" : "🔄 Rafraîchir les cotes") + '</button>' +
+    '<button class="btn ghost" onclick="exportCSV()" ' + (!cards.length ? "disabled" : "") + '>⬇️ Export CSV</button>' +
+    '<button class="btn light" onclick="switchTab(\'' + (ui.tab === "list" ? "add" : "list") + '\')">' +
+    (ui.tab === "list" ? "+ Ajouter une carte" : "← Retour à la liste") + '</button>';
+
+  const main = document.getElementById("main");
+  if (ui.tab === "add") {
+    main.innerHTML =
+      '<section class="card"><h2>📸 Scanner une carte</h2>' +
+      '<p class="muted">Prends la carte en photo : elle sera jointe à la fiche. Puis identifie la carte via la recherche ci-dessous (nom + édition).</p>' +
+      '<input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none">' +
+      '<div class="row">' +
+      '<button class="btn primary" onclick="document.getElementById(\'photoInput\').click()">' + (ui.photo ? "Changer la photo" : "Prendre / choisir une photo") + '</button>' +
+      (ui.photo ? '<img src="' + ui.photo + '" style="width:52px;height:72px;object-fit:cover;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.2)">' +
+        '<button class="btn line" onclick="clearPhoto()">Retirer</button>' : "") +
+      '</div></section>' +
+      '<section class="card"><h2>🔎 Saisir le nom et l\'édition</h2>' +
+      '<p class="muted">Le nom français est reconnu automatiquement ! Exemples : <code>dracaufeu</code>, <code>tortank edition de base</code></p>' +
+      '<form class="row" onsubmit="runSearch(event)">' +
+      '<input type="text" id="searchInput" style="flex:1;min-width:180px" placeholder="Nom de la carte (et édition si besoin)…" value="' + esc(ui.search) + '">' +
+      '<button class="btn primary" type="submit" ' + (ui.searching ? "disabled" : "") + '>' + (ui.searching ? "…" : "Rechercher") + '</button></form>' +
+      (ui.searching ? '<p class="muted" style="margin-top:10px"><span class="spin"></span>Recherche en cours…</p>' : "") +
+      (ui.note ? '<div class="note">🇫🇷→🇬🇧 ' + esc(ui.note) + '</div>' : "") +
+      (ui.error ? '<p class="err">' + esc(ui.error) + '</p>' : "") +
+      '<div class="grid">' + ui.results.map((r) =>
+        '<button class="rbtn" onclick="pickResult(\'' + esc(r.id) + '\')">' +
+        (r.images && r.images.small ? '<img src="' + esc(r.images.small) + '" alt="">' : '') +
+        '<div class="cap"><b>' + esc(r.name) + '</b><br><span style="color:#64748b">' + esc((r.set && r.set.name) || "") + ' · #' + esc(r.number) + '</span></div></button>'
+      ).join("") + '</div></section>' +
+      (ui.pending ? confirmHtml() : "");
+    const pi = document.getElementById("photoInput");
+    if (pi) pi.onchange = (ev) => {
+      const f = ev.target.files && ev.target.files[0];
+      if (f) compressImage(f, 400, (d) => { ui.photo = d; render(); });
+      ev.target.value = "";
+    };
+  } else {
+    main.innerHTML =
+      (ui.refreshMsg ? '<div class="okmsg">' + esc(ui.refreshMsg) + '</div>' : "") +
+      (cards.length === 0 ? '<div class="card empty"><div style="font-size:2.2rem">🗃️</div><b>Ta collection est vide.</b><br><span style="font-size:.85rem">Clique sur « + Ajouter une carte » pour scanner ou saisir une carte.</span></div>'
+       : listHtml(total, totalCards, pricedCount));
+  }
+  document.getElementById("footer").innerHTML =
+    "Cotes fournies par l'API Pokemon TCG (TCGPlayer / CardMarket), en USD. La collection est enregistrée localement dans ce navigateur." +
+    (lastRoute ? '<span style="margin-left:8px;color:#64748b">· Connexion API : ' + esc(lastRoute) + ' ✓</span>' : "");
+}
+
+function confirmHtml() {
+  const p = ui.pending;
+  return '<section class="card" style="border:2px solid #a5b4fc"><h2>✅ Confirmer l\'ajout</h2>' +
+    '<div class="row" style="align-items:flex-start">' +
+    '<img src="' + esc(p.photo || p.imageSmall || p.imageUrl || "") + '" style="width:90px;height:126px;object-fit:cover;border-radius:10px;background:#e2e8f0">' +
+    '<div style="flex:1;min-width:220px">' +
+    '<b>' + esc(p.name) + '</b><div class="meta">' + esc(p.set) + ' · #' + esc(p.number) + (p.rarity ? " · " + esc(p.rarity) : "") + '</div>' +
+    '<div class="meta" style="color:#059669;font-weight:600">Cote actuelle : ' + fmtPrice(p.price) + (p.priceSource ? " (" + esc(p.priceSource) + ")" : "") + '</div>' +
+    '<div class="row" style="margin:10px 0">' +
+    (ui.pendingVariants.length > 1
+      ? '<label>Finition <select onchange="changePendingVariant(this.value)" style="margin-left:6px">' +
+        ui.pendingVariants.map((v) => '<option value="' + esc(v.key) + '"' + (v.key === p.variant ? " selected" : "") + '>' + esc(v.key) + (v.price != null ? " — " + fmtPrice(v.price) : "") + '</option>').join("") + '</select></label>'
+      : '<span class="badge cond">Finition : ' + esc(p.variant) + '</span>') +
+    '<label>Quantité <input type="number" id="pQty" min="1" value="' + p.qty + '" style="width:64px;margin-left:6px"></label>' +
+    '<label>État <select id="pCond" style="margin-left:6px">' +
+    CONDITIONS.map((c) => '<option' + (c === p.condition ? " selected" : "") + '>' + c + '</option>').join("") + '</select></label>' +
+    '</div>' +
+    '<button class="btn green" onclick="confirmAdd()">Ajouter à ma collection</button> ' +
+    '<button class="btn line" onclick="cancelPending()">Annuler</button>' +
+    '</div></div></section>';
+}
+
+function listHtml(total, totalCards, pricedCount) {
+  const sets = [...new Set(cards.map((c) => c.set))].sort((a, b) => a.localeCompare(b));
+  const q = ui.filterText.trim().toLowerCase();
+  const visible = cards.filter((c) => {
+    if (q && !(c.name.toLowerCase().includes(q) || c.set.toLowerCase().includes(q) || c.rarity.toLowerCase().includes(q) || c.variant.toLowerCase().includes(q))) return false;
+    if (ui.filterSet !== "all" && c.set !== ui.filterSet) return false;
+    if (ui.hideUnpriced && c.price == null) return false;
+    return true;
+  }).sort((a, b) => {
+    const d = ui.sortDesc ? -1 : 1;
+    if (ui.sortBy === "name") return d * a.name.localeCompare(b.name);
+    if (ui.sortBy === "set") return d * (a.set.localeCompare(b.set) || String(a.number).localeCompare(String(b.number), undefined, { numeric: true }));
+    if (ui.sortBy === "price") return d * ((a.price == null ? -Infinity : a.price) - (b.price == null ? -Infinity : b.price));
+    if (ui.sortBy === "rarity") return d * (a.rarity || "").localeCompare(b.rarity || "");
+    return d * key(a).localeCompare(key(b));
+  });
+  const vTotal = visible.reduce((s, c) => s + (c.price || 0) * c.qty, 0);
+  const vCount = visible.reduce((s, c) => s + c.qty, 0);
+  return '<section class="card filters"><div class="row">' +
+    '<input type="text" id="filterText" style="flex:1;min-width:180px" placeholder="🔍 Filtrer par nom, édition, n°, rareté, finition…" value="' + esc(ui.filterText) + '">' +
+    '<label>Trier <select id="sortSel">' +
+    [["added","Ajout"],["name","Nom"],["set","Édition"],["price","Cote"],["rarity","Rareté"]].map((o) =>
+      '<option value="' + o[0] + '"' + (ui.sortBy === o[0] ? " selected" : "") + '>' + o[1] + '</option>').join("") + '</select></label>' +
+    '<button class="btn line" onclick="ui.sortDesc=!ui.sortDesc;render()">' + (ui.sortDesc ? "↓" : "↑") + '</button>' +
+    '</div><div class="row">' +
+    '<label>Édition <select id="setSel"><option value="all">Toutes</option>' +
+    sets.map((s) => '<option value="' + esc(s) + '"' + (ui.filterSet === s ? " selected" : "") + '>' + esc(s) + '</option>').join("") + '</select></label>' +
+    '<label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="hpChk" ' + (ui.hideUnpriced ? "checked" : "") + '> Masquer les cartes non cotées</label>' +
+    ((ui.filterText || ui.filterSet !== "all" || ui.hideUnpriced) ? '<button class="btn line" style="color:#4f46e5" onclick="ui.filterText=\'\';ui.filterSet=\'all\';ui.hideUnpriced=false;render()">Réinitialiser</button>' : "") +
+    '<span style="margin-left:auto;color:#94a3b8;font-size:.75rem">' + vCount + " carte(s) affichée(s) · " + fmtPrice(vTotal) + '</span>' +
+    '</div></section>' +
+    '<div class="stats">' +
+    '<div class="stat"><div class="lab">Cartes</div><div class="val">' + totalCards + '</div></div>' +
+    '<div class="stat"><div class="lab">Cotées</div><div class="val">' + pricedCount + "/" + cards.length + '</div></div>' +
+    '<div class="stat"><div class="lab">Valeur totale</div><div class="val green">' + fmtPrice(total) + '</div></div>' +
+    '</div>' +
+    visible.map((c) => itemHtml(c)).join("") +
+    (visible.length === 0 ? '<div class="card empty" style="padding:20px">Aucune carte ne correspond aux filtres actuels.</div>' : "");
+}
+function itemHtml(c) {
+  const k = key(c);
+  const holo = c.variant === "Holo" || c.variant === "Reverse Holo";
+  const src = c.photo || c.imageSmall || c.imageUrl;
+  return '<div class="item">' +
+    '<img src="' + esc(src || "") + '" alt="">' +
+    '<div class="info"><div class="nm">' + esc(c.name) +
+    '<span class="badge qty">×' + c.qty + '</span>' +
+    '<span class="badge cond">' + esc(c.condition) + '</span>' +
+    (holo ? '<span class="badge holo">' + (c.variant === "Holo" ? "✨ Holo" : "🔁 Reverse Holo") + '</span>' : "") +
+    '</div><div class="meta">' + esc(c.set) + ' · #' + esc(c.number) + (c.rarity ? " · " + esc(c.rarity) : "") + " · " + esc(c.variant) + '</div>' +
+    '<div class="meta">Cote maj : ' + fmtDate(c.priceDate) + (c.priceSource ? " · " + esc(c.priceSource) : "") + '</div></div>' +
+    '<div class="pricebox"><div class="price">' + fmtPrice(c.price) + '</div>' +
+    (c.price != null && c.qty > 1 ? '<div style="font-size:.68rem;color:#94a3b8">total ' + fmtPrice(c.price * c.qty) + '</div>' : "") +
+    '<div style="margin-top:4px"><button class="xbtn" onclick="refreshCardByKey(\'' + esc(k) + '\')" ' + (ui.busyKeys.has(k) ? "disabled" : "") + ' title="Rafraîchir la cote">' + (ui.busyKeys.has(k) ? "…" : "🔄") + '</button>' +
+    '<button class="xbtn del" onclick="removeCard(\'' + esc(k) + '\')" title="Supprimer">✕</button></div></div></div>';
+}
+
+// Écoute des filtres (on synchronise l'état puis on re-render)
+document.getElementById("main").addEventListener("input", (ev) => {
+  if (ev.target.id === "filterText") { ui.filterText = ev.target.value; render(); }
+});
+document.getElementById("main").addEventListener("change", (ev) => {
+  if (ev.target.id === "sortSel") { ui.sortBy = ev.target.value; ui.sortDesc = ev.target.value === "price"; render(); }
+  if (ev.target.id === "setSel") { ui.filterSet = ev.target.value; render(); }
+  if (ev.target.id === "hpChk") { ui.hideUnpriced = ev.target.checked; render(); }
+});
+
+render();
+</script>
+</body>
+</html>
