@@ -235,6 +235,31 @@ function suggestFr(q, max) {
   return [...new Set(out)];
 }
 
+// ---------- Affichage en français (reverse du dictionnaire) ----------
+const SMALL_WORDS = new Set(["et", "de", "des", "du", "la", "le", "les", "au", "aux", "a"]);
+const prettify = (s) => s.split(" ").map((w, i) => {
+  if (!w) return w;
+  if (i > 0 && SMALL_WORDS.has(w)) return w;
+  return w.charAt(0).toUpperCase() + w.slice(1);
+}).join(" ");
+const EN_POKE = {};
+for (const fr in FR_POKE) EN_POKE[FR_POKE[fr]] = prettify(fr);
+const EN_SETS = {};
+for (const fr in FR_SETS) EN_SETS[FR_SETS[fr]] = prettify(fr);
+const EN_POKE_KEYS = Object.keys(EN_POKE).sort((a, b) => b.length - a.length);
+function frName(n) {
+  if (!n) return n;
+  if (EN_POKE[n]) return EN_POKE[n];
+  for (const k of EN_POKE_KEYS) {
+    if (n.startsWith(k + " ")) return EN_POKE[k] + n.slice(k.length);
+  }
+  return n;
+}
+function frSet(s) { return (s && EN_SETS[s]) || s; }
+function cmUrl(c) {
+  return "https://www.cardmarket.com/fr/Pokemon/Products/Singles?searchQuery=" + encodeURIComponent(c.name);
+}
+
 // ---------- Connexion API (direct puis proxys en repli) ----------
 const PROXY_ROUTES = [
   { label: "directe", wrap: (u) => u },
@@ -436,20 +461,20 @@ async function refreshAll() {
     save(); render();
   }
   ui.refreshing = false;
-  ui.refreshMsg = "Cotes actualisées : " + updated + "/" + cards.length + " carte(s).";
+  ui.refreshMsg = "Cotes US actualisées : " + updated + "/" + cards.length + " carte(s).";
   render();
 }
 function exportCSV() {
-  const headers = ["Nom","Édition","Numéro","Rareté","Variante","État","Quantité","Cote ($)","Cote × Qté ($)","Source","Dernière mise à jour","ID API","Photo perso"];
+  const headers = ["Nom (FR)","Nom (EN)","Édition (FR)","Édition (EN)","Numéro","Rareté","Variante","État","Quantité","Cote US ($, indicative)","Cote × Qté ($)","Source","Dernière mise à jour","ID API","Photo perso"];
   const e = (v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
   const total = cards.reduce((s, c) => s + (c.price || 0) * c.qty, 0);
   const totalCards = cards.reduce((s, c) => s + c.qty, 0);
   const rows = cards.map((c) => [
-    e(c.name), e(c.set), e(c.number), e(c.rarity), e(c.variant), e(c.condition), c.qty,
+    e(frName(c.name)), e(c.name), e(frSet(c.set)), e(c.set), e(c.number), e(c.rarity), e(c.variant), e(c.condition), c.qty,
     c.price != null ? c.price.toFixed(2) : "", c.price != null ? (c.price * c.qty).toFixed(2) : "",
     e(c.priceSource), e(c.priceDate), e(c.id), c.photo ? "oui" : "non",
   ].join(";"));
-  const csv = "\uFEFF" + headers.join(";") + "\n" + rows.join("\n") + "\n" + ["TOTAL","","","","","",totalCards,"",total.toFixed(2),"","","","",""].join(";");
+  const csv = "\uFEFF" + headers.join(";") + "\n" + rows.join("\n") + "\n" + ["TOTAL","","","","","","","",totalCards,"",total.toFixed(2),"","","","","",""].join(";");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -494,7 +519,9 @@ function render() {
       '<div class="grid">' + ui.results.map((r) =>
         '<button class="rbtn" onclick="pickResult(\'' + esc(r.id) + '\')">' +
         (r.images && r.images.small ? '<img src="' + esc(r.images.small) + '" alt="">' : '') +
-        '<div class="cap"><b>' + esc(r.name) + '</b><br><span style="color:#64748b">' + esc((r.set && r.set.name) || "") + ' · #' + esc(r.number) + '</span></div></button>'
+        '<div class="cap"><b>' + esc(frName(r.name)) + '</b>' +
+        (frName(r.name) !== r.name ? '<br><span style="color:#94a3b8;font-size:.9em">' + esc(r.name) + '</span>' : '') +
+        '<br><span style="color:#64748b">' + esc(frSet((r.set && r.set.name) || "")) + ' · #' + esc(r.number) + '</span></div></button>'
       ).join("") + '</div></section>' +
       (ui.pending ? confirmHtml() : "");
     const pi = document.getElementById("photoInput");
@@ -510,7 +537,7 @@ function render() {
        : listHtml(total, totalCards, pricedCount));
   }
   document.getElementById("footer").innerHTML =
-    "Cotes fournies par l'API Pokemon TCG (TCGPlayer / CardMarket), en USD. La collection est enregistrée localement dans ce navigateur." +
+    "Cotes affichées : marché américain (TCGPlayer / eBay), en USD — valeur indicative. Pour la cote du marché français (en euros), touche 🇫🇷 FR sur chaque carte : elle ouvre la fiche Cardmarket. Noms et éditions affichés en français. La collection est enregistrée localement dans ce navigateur." +
     (lastRoute ? '<span style="margin-left:8px;color:#64748b">· Connexion API : ' + esc(lastRoute) + ' ✓</span>' : "");
 }
 
@@ -520,8 +547,10 @@ function confirmHtml() {
     '<div class="row" style="align-items:flex-start">' +
     '<img src="' + esc(p.photo || p.imageSmall || p.imageUrl || "") + '" style="width:90px;height:126px;object-fit:cover;border-radius:10px;background:#e2e8f0">' +
     '<div style="flex:1;min-width:220px">' +
-    '<b>' + esc(p.name) + '</b><div class="meta">' + esc(p.set) + ' · #' + esc(p.number) + (p.rarity ? " · " + esc(p.rarity) : "") + '</div>' +
-    '<div class="meta" style="color:#059669;font-weight:600">Cote actuelle : ' + fmtPrice(p.price) + (p.priceSource ? " (" + esc(p.priceSource) + ")" : "") + '</div>' +
+    '<b>' + esc(frName(p.name)) + '</b>' + (frName(p.name) !== p.name ? ' <span style="color:#94a3b8;font-size:.8em">' + esc(p.name) + '</span>' : "") +
+    '<div class="meta">' + esc(frSet(p.set)) + (frSet(p.set) !== p.set ? " (" + esc(p.set) + ")" : "") + ' · #' + esc(p.number) + (p.rarity ? " · " + esc(p.rarity) : "") + '</div>' +
+    '<div class="meta" style="color:#059669;font-weight:600">Cote US (indicative) : ' + fmtPrice(p.price) + (p.priceSource ? " (" + esc(p.priceSource) + ")" : "") + '</div>' +
+    '<div class="meta">🇫🇷 <a href="' + esc(cmUrl(p)) + '" target="_blank" rel="noopener" style="color:#4f46e5">Voir la cote française sur Cardmarket</a></div>' +
     '<div class="row" style="margin:10px 0">' +
     (ui.pendingVariants.length > 1
       ? '<label>Finition <select onchange="changePendingVariant(this.value)" style="margin-left:6px">' +
@@ -540,7 +569,10 @@ function listHtml(total, totalCards, pricedCount) {
   const sets = [...new Set(cards.map((c) => c.set))].sort((a, b) => a.localeCompare(b));
   const q = ui.filterText.trim().toLowerCase();
   const visible = cards.filter((c) => {
-    if (q && !(c.name.toLowerCase().includes(q) || c.set.toLowerCase().includes(q) || c.rarity.toLowerCase().includes(q) || c.variant.toLowerCase().includes(q))) return false;
+    if (q && !(
+      c.name.toLowerCase().includes(q) || frName(c.name).toLowerCase().includes(q) ||
+      c.set.toLowerCase().includes(q) || frSet(c.set).toLowerCase().includes(q) ||
+      c.rarity.toLowerCase().includes(q) || c.variant.toLowerCase().includes(q))) return false;
     if (ui.filterSet !== "all" && c.set !== ui.filterSet) return false;
     if (ui.hideUnpriced && c.price == null) return false;
     return true;
@@ -562,7 +594,7 @@ function listHtml(total, totalCards, pricedCount) {
     '<button class="btn line" onclick="ui.sortDesc=!ui.sortDesc;render()">' + (ui.sortDesc ? "↓" : "↑") + '</button>' +
     '</div><div class="row">' +
     '<label>Édition <select id="setSel"><option value="all">Toutes</option>' +
-    sets.map((s) => '<option value="' + esc(s) + '"' + (ui.filterSet === s ? " selected" : "") + '>' + esc(s) + '</option>').join("") + '</select></label>' +
+    sets.map((s) => '<option value="' + esc(s) + '"' + (ui.filterSet === s ? " selected" : "") + '>' + esc(frSet(s)) + (frSet(s) !== s ? "" : "") + '</option>').join("") + '</select></label>' +
     '<label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="hpChk" ' + (ui.hideUnpriced ? "checked" : "") + '> Masquer les cartes non cotées</label>' +
     ((ui.filterText || ui.filterSet !== "all" || ui.hideUnpriced) ? '<button class="btn line" style="color:#4f46e5" onclick="ui.filterText=\'\';ui.filterSet=\'all\';ui.hideUnpriced=false;render()">Réinitialiser</button>' : "") +
     '<span style="margin-left:auto;color:#94a3b8;font-size:.75rem">' + vCount + " carte(s) affichée(s) · " + fmtPrice(vTotal) + '</span>' +
@@ -581,15 +613,16 @@ function itemHtml(c) {
   const src = c.photo || c.imageSmall || c.imageUrl;
   return '<div class="item">' +
     '<img src="' + esc(src || "") + '" alt="">' +
-    '<div class="info"><div class="nm">' + esc(c.name) +
+    '<div class="info"><div class="nm">' + esc(frName(c.name)) + (frName(c.name) !== c.name ? ' <span style="color:#94a3b8;font-size:.78em;font-weight:400">' + esc(c.name) + '</span>' : "") +
     '<span class="badge qty">×' + c.qty + '</span>' +
     '<span class="badge cond">' + esc(c.condition) + '</span>' +
     (holo ? '<span class="badge holo">' + (c.variant === "Holo" ? "✨ Holo" : "🔁 Reverse Holo") + '</span>' : "") +
-    '</div><div class="meta">' + esc(c.set) + ' · #' + esc(c.number) + (c.rarity ? " · " + esc(c.rarity) : "") + " · " + esc(c.variant) + '</div>' +
-    '<div class="meta">Cote maj : ' + fmtDate(c.priceDate) + (c.priceSource ? " · " + esc(c.priceSource) : "") + '</div></div>' +
+    '</div><div class="meta">' + esc(frSet(c.set)) + ' · #' + esc(c.number) + (c.rarity ? " · " + esc(c.rarity) : "") + " · " + esc(c.variant) + '</div>' +
+    '<div class="meta">Cote US (indicative) maj : ' + fmtDate(c.priceDate) + (c.priceSource ? " · " + esc(c.priceSource) : "") + '</div></div>' +
     '<div class="pricebox"><div class="price">' + fmtPrice(c.price) + '</div>' +
     (c.price != null && c.qty > 1 ? '<div style="font-size:.68rem;color:#94a3b8">total ' + fmtPrice(c.price * c.qty) + '</div>' : "") +
-    '<div style="margin-top:4px"><button class="xbtn" onclick="refreshCardByKey(\'' + esc(k) + '\')" ' + (ui.busyKeys.has(k) ? "disabled" : "") + ' title="Rafraîchir la cote">' + (ui.busyKeys.has(k) ? "…" : "🔄") + '</button>' +
+    '<div style="margin-top:4px"><a class="xbtn" style="display:inline-block;text-decoration:none" href="' + esc(cmUrl(c)) + '" target="_blank" rel="noopener" title="Voir la cote française (Cardmarket)">🇫🇷 FR</a>' +
+    '<button class="xbtn" onclick="refreshCardByKey(\'' + esc(k) + '\')" ' + (ui.busyKeys.has(k) ? "disabled" : "") + ' title="Rafraîchir la cote US">' + (ui.busyKeys.has(k) ? "…" : "🔄") + '</button>' +
     '<button class="xbtn del" onclick="removeCard(\'' + esc(k) + '\')" title="Supprimer">✕</button></div></div></div>';
 }
 
