@@ -112,6 +112,14 @@ button:disabled{opacity:.5;cursor:not-allowed}
 </div>
 
 <div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
+<div class="modal-bg" id="confirmBg"><div class="modal" style="max-width:420px">
+  <h3 id="confirmTitle">⚠️ Confirmation</h3>
+  <div id="confirmMsg" style="font-size:.85rem;line-height:1.5;margin:10px 0 16px;white-space:pre-line"></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end">
+    <button class="btn-sec btn-mini" id="confirmNo">Annuler</button>
+    <button class="btn-acc btn-mini" id="confirmYes">Confirmer</button>
+  </div>
+</div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -411,6 +419,17 @@ function exportCsv() {
   toast("CSV exporté");
 }
 
+// boîte de confirmation intégrée (confirm() natif ignoré en app iOS "écran d'accueil")
+function askConfirm(title, msg, yesLabel, cb) {
+  $("confirmTitle").textContent = title;
+  $("confirmMsg").textContent = msg;
+  $("confirmYes").textContent = yesLabel || "Confirmer";
+  const bg = $("confirmBg"); bg.classList.add("on");
+  $("confirmNo").onclick = () => bg.classList.remove("on");
+  bg.onclick = e => { if (e.target === bg) bg.classList.remove("on"); };
+  $("confirmYes").onclick = () => { bg.classList.remove("on"); cb(); };
+}
+
 // ---------- Import CSV (même format que l'export) ----------
 function parseCsv(text) {
   // retire le BOM éventuel
@@ -444,34 +463,35 @@ function importCsv() {
       const idx = {}; rows[0].forEach((h, i) => idx[h.trim()] = i);
       if (idx["Nom FR"] == null || idx["ID"] == null) { toast("En-têtes invalides (attendus : Nom FR, ID…)", true); return; }
       const get = (r, k) => idx[k] != null ? String(r[idx[k]] || "").trim() : "";
-      // ATTENTION : écrasement total
-      const ok = confirm(
-        "⚠️ ATTENTION : l'import va REMPLACER TOUTE la collection actuelle\n" +
-        "(" + ui.coll.length + " référence(s) enregistrée(s)) par les " + (rows.length - 1) + " ligne(s) du fichier.\n\n" +
-        "Cette action est irréversible. Continuer ?"
+      // ATTENTION : écrasement total (confirmation intégrée, pas de confirm() natif)
+      askConfirm(
+        "⚠️ Import CSV",
+        "L'import va REMPLACER TOUTE la collection actuelle (" + ui.coll.length + " référence(s)) par les " + (rows.length - 1) + " ligne(s) du fichier.\n\nCette action est irréversible. Continuer ?",
+        "Importer et remplacer",
+        () => {
+          const items = [];
+          let skipped = 0;
+          for (const r of rows.slice(1)) {
+            const name = get(r, "Nom FR"), id = get(r, "ID");
+            if (!name || !id) { skipped++; continue; }
+            const price = get(r, "Cote €");
+            items.push({
+              id: id, name: name,
+              setName: get(r, "Édition FR"), number: get(r, "Numéro"),
+              rarity: get(r, "Rareté"), finish: get(r, "Finition") || "Normale",
+              owner: get(r, "Propriétaire"),
+              qty: Math.max(1, parseInt(get(r, "Qté"), 10) || 1),
+              price: price !== "" && !isNaN(parseFloat(price.replace(",", "."))) ? parseFloat(price.replace(",", ".")) : null,
+              source: get(r, "Source") || "Import CSV",
+              priceDate: get(r, "Maj") && get(r, "Maj") !== "—" ? csvDateToIso(get(r, "Maj")) : null,
+              image: null, photo: null, added: Date.now()
+            });
+          }
+          ui.coll = items; save(); render();
+          toast("Importé : " + items.length + " carte(s)" + (skipped ? " (" + skipped + " ligne(s) ignorée(s))" : ""));
+          enrichImages();
+        }
       );
-      if (!ok) { toast("Import annulé"); return; }
-      const items = [];
-      let skipped = 0;
-      for (const r of rows.slice(1)) {
-        const name = get(r, "Nom FR"), id = get(r, "ID");
-        if (!name || !id) { skipped++; continue; }
-        const price = get(r, "Cote €");
-        items.push({
-          id: id, name: name,
-          setName: get(r, "Édition FR"), number: get(r, "Numéro"),
-          rarity: get(r, "Rareté"), finish: get(r, "Finition") || "Normale",
-          owner: get(r, "Propriétaire"),
-          qty: Math.max(1, parseInt(get(r, "Qté"), 10) || 1),
-          price: price !== "" && !isNaN(parseFloat(price.replace(",", "."))) ? parseFloat(price.replace(",", ".")) : null,
-          source: get(r, "Source") || "Import CSV",
-          priceDate: get(r, "Maj") && get(r, "Maj") !== "—" ? csvDateToIso(get(r, "Maj")) : null,
-          image: null, photo: null, added: Date.now()
-        });
-      }
-      ui.coll = items; save(); render();
-      toast("Importé : " + items.length + " carte(s)" + (skipped ? " (" + skipped + " ligne(s) ignorée(s))" : ""));
-      enrichImages();
     };
     rd.readAsText(f, "utf-8");
   };
