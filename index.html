@@ -1,1110 +1,345 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ma Collection Pokémon — Pokétrace</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ma Collection Pokémon v3</title>
 <style>
-  :root { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif; color: #1e293b; background: #f1f5f9; margin: 0; }
-  * { box-sizing: border-box; }
-  header { background: linear-gradient(90deg,#0f766e,#059669); color: #fff; padding: 18px 16px; }
-  .hwrap { max-width: 860px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
-  h1 { font-size: 1.4rem; margin: 0; }
-  .sub { color: rgba(255,255,255,.85); font-size: .85rem; margin-top: 2px; }
-  .hbtns { display: flex; gap: 8px; flex-wrap: wrap; }
-  main { max-width: 860px; margin: 0 auto; padding: 18px 16px 60px; }
-  .card { background: #fff; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 16px; margin-bottom: 14px; }
-  h2 { font-size: 1.05rem; margin: 0 0 6px; }
-  .muted { color: #64748b; font-size: .85rem; margin: 0 0 12px; }
-  input[type=text], input[type=number], select { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: .9rem; font-family: inherit; background: #fff; }
-  input:focus, select:focus { outline: 2px solid #6ee7b7; border-color: #059669; }
-  .btn { padding: 8px 14px; border-radius: 8px; border: none; font-size: .88rem; font-weight: 500; cursor: pointer; font-family: inherit; }
-  .btn.primary { background: #059669; color: #fff; } .btn.primary:hover { background: #047857; }
-  .btn.ghost { background: rgba(255,255,255,.15); color: #fff; } .btn.ghost:hover { background: rgba(255,255,255,.28); }
-  .btn.light { background: #fff; color: #059669; } .btn.light:hover { background: #d1fae5; }
-  .btn.green { background: #059669; color: #fff; }
-  .btn.line { background: #fff; border: 1px solid #cbd5e1; color: #334155; } .btn.line:hover { background: #f8fafc; }
-  .btn:disabled { opacity: .45; cursor: not-allowed; }
-  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .note { background: #d1fae5; color: #065f46; padding: 8px 12px; border-radius: 8px; font-size: .85rem; margin: 10px 0; }
-  .err { color: #dc2626; font-size: .85rem; margin: 10px 0; }
-  .okmsg { background: #d1fae5; color: #065f46; padding: 8px 12px; border-radius: 8px; font-size: .85rem; margin-bottom: 12px; }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 14px; }
-  .stat { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 12px; text-align: center; }
-  .stat .lab { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: #64748b; }
-  .stat .val { font-size: 1.15rem; font-weight: 700; margin-top: 2px; }
-  .stat .val.green { color: #059669; }
-  .item { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 10px 12px; margin-bottom: 10px; display: flex; gap: 12px; align-items: center; }
-  .item img { width: 56px; height: 80px; object-fit: cover; border-radius: 8px; background: #e2e8f0; flex-shrink: 0; }
-  .item .info { flex: 1; min-width: 0; }
-  .item .nm { font-weight: 600; }
-  .badge { display: inline-block; font-size: .68rem; border-radius: 99px; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
-  .badge.qty { background: #f1f5f9; color: #334155; }
-  .badge.cond { background: #d1fae5; color: #065f46; }
-  .badge.holo { background: linear-gradient(90deg,#fde68a,#fef3c7); color: #92400e; font-weight: 600; }
-  .meta { color: #64748b; font-size: .75rem; margin-top: 2px; }
-  .pricebox { text-align: right; flex-shrink: 0; }
-  .price { font-weight: 700; color: #059669; }
-  .xbtn { border: 1px solid #e2e8f0; background: #fff; border-radius: 6px; padding: 3px 8px; cursor: pointer; font-size: .78rem; margin-left: 4px; font-family: inherit; }
-  .xbtn.del { border-color: #fecaca; color: #dc2626; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 12px; }
-  .rbtn { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0; cursor: pointer; overflow: hidden; text-align: left; }
-  .rbtn:hover { border-color: #34d399; box-shadow: 0 2px 8px rgba(5,150,105,.2); }
-  .rbtn img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; background: #e2e8f0; }
-  .rbtn .cap { padding: 6px 8px; font-size: .72rem; }
-  .spin { display: inline-block; width: 15px; height: 15px; border: 2px solid #cbd5e1; border-top-color: #059669; border-radius: 50%; animation: sp .7s linear infinite; vertical-align: -2px; margin-right: 6px; }
-  @keyframes sp { to { transform: rotate(360deg); } }
-  .filters .row { margin-bottom: 8px; }
-  footer { max-width: 860px; margin: 0 auto; padding: 0 16px 30px; font-size: .72rem; color: #94a3b8; }
-  code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
-  .empty { text-align: center; color: #64748b; padding: 36px 0; }
-  .keycard { max-width: 520px; margin: 40px auto; }
+:root{--bg:#0f1220;--card:#1a1f36;--card2:#232a4a;--txt:#eef1ff;--mut:#9aa3c7;--acc:#ffcb05;--acc2:#3b82f6;--ok:#34d399;--bad:#f87171;--bor:#2e3560;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding:16px}
+h1{font-size:1.4rem;text-align:center;margin-bottom:4px}
+.sub{text-align:center;color:var(--mut);font-size:.8rem;margin-bottom:16px}
+.panel{background:var(--card);border:1px solid var(--bor);border-radius:12px;padding:14px;margin-bottom:14px}
+label{font-size:.75rem;color:var(--mut);display:block;margin-bottom:4px}
+input,select,button{font-family:inherit;font-size:.95rem;border-radius:8px;border:1px solid var(--bor);background:var(--card2);color:var(--txt);padding:8px 10px}
+input,select{width:100%}
+button{cursor:pointer;font-weight:600;transition:filter .15s}
+button:hover{filter:brightness(1.15)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btn-acc{background:var(--acc);color:#1a1a1a;border:none}
+.btn-sec{background:var(--card2)}
+.btn-mini{padding:4px 8px;font-size:.8rem}
+.searchrow{display:flex;gap:8px}
+.searchrow input{flex:1}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:12px}
+.rescard{background:var(--card2);border:1px solid var(--bor);border-radius:10px;padding:8px;text-align:center;cursor:pointer;transition:transform .1s,border-color .1s}
+.rescard:hover{transform:translateY(-2px);border-color:var(--acc)}
+.rescard img{width:100%;border-radius:6px;background:#000}
+.rescard .n{font-size:.8rem;font-weight:700;margin-top:6px;line-height:1.2}
+.rescard .s{font-size:.68rem;color:var(--mut);margin-top:2px}
+.tbl{width:100%;border-collapse:collapse;font-size:.82rem}
+.tbl th{position:sticky;top:0;background:var(--card2);color:var(--mut);text-align:left;padding:8px 6px;font-size:.72rem;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.tbl td{padding:8px 6px;border-top:1px solid var(--bor);vertical-align:middle}
+.tbl img.ph{width:44px;height:44px;object-fit:cover;border-radius:6px;display:block}
+.thumb{width:40px;border-radius:5px;display:block}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.68rem;font-weight:700;background:var(--card2);border:1px solid var(--bor)}
+.badge.holo{background:#312e81;border-color:#6366f1}
+.badge.rh{background:#065f46;border-color:#34d399}
+.price{font-weight:800;color:var(--ok);white-space:nowrap}
+.mut{color:var(--mut);font-size:.7rem}
+.stats{display:flex;flex-wrap:wrap;gap:10px;font-size:.8rem}
+.stats b{color:var(--acc)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:50;padding:12px}
+.modal-bg.on{display:flex}
+.modal{background:var(--card);border:1px solid var(--bor);border-radius:14px;max-width:560px;width:100%;max-height:92vh;overflow:auto;padding:16px}
+.modal h3{margin-bottom:8px;font-size:1.05rem}
+.mgrid{display:flex;gap:14px;flex-wrap:wrap}
+.mgrid img{width:170px;border-radius:10px;background:#000}
+.mfields{flex:1;min-width:180px;display:flex;flex-direction:column;gap:10px}
+.rowactions{white-space:nowrap;text-align:right}
+.status{font-size:.72rem;margin-top:6px;color:var(--mut)}
+.status.err{color:var(--bad)}
+.status.ok{color:var(--ok)}
+.filters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+@media(max-width:640px){.filters{grid-template-columns:1fr}.tbl{font-size:.75rem}}
+.empty{text-align:center;color:var(--mut);padding:24px;font-size:.85rem}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--acc);padding:10px 18px;border-radius:10px;font-size:.85rem;display:none;z-index:99}
+.toast.on{display:block}
 </style>
 </head>
 <body>
-<header>
-  <div class="hwrap">
-    <div>
-      <h1>⚡ Ma Collection Pokémon</h1>
-      <div class="sub" id="subTitle"></div>
-    </div>
-    <div class="hbtns" id="hbtns"></div>
+<h1>⚡ Ma Collection Pokémon — v3</h1>
+<div class="sub">Base FR : TCGdex · Cotes € : Pokemon TCG API (CardMarket)</div>
+
+<div class="panel">
+  <div class="searchrow">
+    <input id="q" placeholder="Nom de la carte en français… (ex. Exagide, Pikachu)">
+    <button class="btn-acc" id="btnSearch">Rechercher</button>
   </div>
-</header>
-<main id="main"></main>
-<footer id="footer"></footer>
+  <div id="searchStatus" class="status"></div>
+  <div id="results" class="grid"></div>
+</div>
+
+<div class="panel">
+  <div class="stats" id="stats"></div>
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+    <button class="btn-sec btn-mini" id="btnRefreshAll">🔄 Rafraîchir toutes les cotes</button>
+    <button class="btn-sec btn-mini" id="btnCsv">📄 Export CSV</button>
+  </div>
+  <div style="margin-top:10px" class="filters">
+    <div><label>Filtrer (nom, édition)</label><input id="fSearch" placeholder="Filtre…"></div>
+    <div><label>Finition</label><select id="fFinish"><option value="">Toutes</option><option>Normale</option><option>Holo</option><option>Reverse Holo</option></select></div>
+    <div><label>Trier par</label><select id="fSort"><option value="name">Nom A→Z</option><option value="set">Édition A→Z</option><option value="price">Cote ↓</option><option value="added">Ajout récent</option></select></div>
+  </div>
+</div>
+
+<div class="panel">
+  <table class="tbl"><thead><tr>
+    <th>Photo</th><th data-s="name">Carte</th><th data-s="set">Édition</th><th>#</th><th data-s="finish">Finition</th><th>Qté</th><th data-s="price">Cote €</th><th>Total €</th><th>Maj</th><th></th>
+  </tr></thead><tbody id="tbody"></tbody></table>
+  <div id="collEmpty" class="empty">Collection vide — recherche une carte pour commencer.</div>
+</div>
+
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
 
 <script>
 "use strict";
-// ============================================================
-// Ma Collection Pokémon v2 — cotes via l'API Pokétrace.
-// Clé API stockée localement, quota affiché en temps réel.
-// ============================================================
-const PT = "https://api.poketrace.com/v1";
-const STORAGE_KEY = "pkmn-collection-v2";
-const KEY_STORE = "pkmn-pt-key";
+const LS_KEY = "pkmn-collection-v3";
+const TCGDEX = "https://api.tcgdex.net/v2/fr";
+const PTCG = "https://api.pokemontcg.io/v2/cards";
+const detailCache = new Map(); // tcgdex id -> detail JSON
 
-const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-const FR_POKE = {
-  "abo":"Ekans", "abra":"Abra", "absol":"Absol", "aeromite":"Venomoth",
-  "aeropteryx":"Archeops", "aflamanoir":"Heatmor", "airmure":"Skarmory", "akwakwak":"Golduck",
-  "alakazam":"Alakazam", "aligatueur":"Feraligatr", "altaria":"Altaria", "ama-ama":"Stakataka",
-  "amagara":"Amaura", "amassel":"Naclstack", "amonistar":"Omastar", "amonita":"Omanyte",
-  "amovenus":"Enamorus", "amphinobi":"Greninja", "ampibidou":"Bellibolt", "anchwatt":"Tynamo",
-  "angoliath":"Grimmsnarl", "anorith":"Anorith", "apireine":"Vespiquen", "apitrini":"Combee",
-  "aquali":"Vaporeon", "arakdo":"Surskit", "araqua":"Dewpider", "arbok":"Arbok",
-  "arboliva":"Arboliva", "arcanin":"Arcanine", "arceus":"Arceus", "archeduc":"Decidueye",
-  "archeodong":"Bronzong", "archeomire":"Bronzor", "arcko":"Treecko", "argouste":"Gumshoos",
-  "arkeapti":"Archen", "armaldo":"Armaldo", "armulys":"Silcoon", "arrozard":"Drizzile",
-  "artikodin":"Articuno", "aspicot":"Weedle", "astronelle":"Orbeetle", "avaltout":"Swalot",
-  "axoloto":"Wooper", "azumarill":"Azumarill", "azurill":"Azurill", "babimanta":"Mantyke",
-  "bacabouh":"Sandygast", "badabouin":"Thwackey", "baggaid":"Scrafty", "baggiguane":"Scraggy",
-  "bagonene":"Quilladin", "balbaleze":"Cetitan", "balbuto":"Baltoy", "balignon":"Shroomish",
-  "bamboiselle":"Celesteela", "banshitrouye":"Gourgeist", "baojian":"Chien-Pao", "barbicha":"Whiscash",
-  "bargantua":"Basculin", "barloche":"Barboach", "barpau":"Feebas", "bastiodon":"Bastiodon",
-  "batracne":"Palpitoad", "baudrive":"Drifloon", "bazoucan":"Toucannon", "bebecaille":"Jangmo-o",
-  "bekaglacon":"Eiscue", "bekipan":"Pelipper", "beldeneige":"Frosmoth", "berasca":"Rabsca",
-  "berserkatt":"Perrserker", "betochef":"Conkeldurr", "bibichut":"Hatenna", "blancoton":"Eldegoss",
-  "bleuseille":"Corvisquire", "blindalys":"Cascoon", "blindepique":"Chesnaught", "blizzaroi":"Abomasnow",
-  "blizzeval":"Glastrier", "blizzi":"Snover", "boguerisse":"Quilladin", "bombydou":"Cutiefly",
-  "boreas":"Tornadus", "boskara":"Grotle", "bouldeneu":"Tangrowth", "boumata":"Turtonator",
-  "bourrinos":"Mudsdale", "boustiflor":"Weepinbell", "braisillon":"Fletchinder", "branette":"Banette",
-  "brasegali":"Blaziken", "brindibou":"Rowlet", "briochien":"Dachsbun", "brocelome":"Phantump",
-  "brouhabam":"Exploud", "broussatif":"Browt", "brutalibre":"Hawlucha", "brutapode":"Scolipede",
-  "bruyverne":"Noivern", "bulbizarre":"Bulbasaur", "cablifere":"Xurkitree", "cabriolaine":"Skiddo",
-  "cacnea":"Cacnea", "cacturne":"Cacturne", "cadoizo":"Delibird", "caloulou":"Pombon",
-  "camerupt":"Camerupt", "canarbello":"Quaxwell", "canarticho":"Farfetch'd", "cancrelove":"Pheromosa",
-  "candine":"Steenee", "caninos":"Growlithe", "capidextre":"Ambipom", "capumain":"Aipom",
-  "carabaffe":"Wartortle", "carabing":"Karrablast", "carapagos":"Tirtouga", "carapuce":"Squirtle",
-  "caratroc":"Shuckle", "carchacrok":"Garchomp", "carmache":"Gabite", "carmadura":"Armarouge",
-  "carvanha":"Carvanha", "castorno":"Bibarel", "celebi":"Celebi", "cerbyllin":"Wyrdeer",
-  "cerfrousse":"Stantler", "ceribou":"Cherubi", "ceriflor":"Cherrim", "chacripan":"Purrloin",
-  "chaffreux":"Purugly", "chaglam":"Glameow", "chamallot":"Numel", "chapignon":"Breloom",
-  "chapotus":"Hattrem", "charbambin":"Charcadet", "charbi":"Rolycoly", "charibari":"Cufant",
-  "charkos":"Rampardos", "charmillon":"Beautifly", "charmilly":"Alcremie", "charmina":"Medicham",
-  "charpenti":"Timburr", "chartor":"Torkoal", "chef-de-fer":"Iron Crown", "chelours":"Bewear",
-  "chenipan":"Caterpie", "chenipotte":"Wurmple", "cheniselle":"Wormadam", "cheniti":"Burmy",
-  "chetiflor":"Bellsprout", "chevroum":"Gogoat", "chimpenfeu":"Monferno", "chinchidou":"Minccino",
-  "chlorobule":"Petilil", "chochodile":"Fuecoco", "chongjian":"Wo-Chien", "chovsourir":"Woobat",
-  "chrysacier":"Metapod", "chrysapile":"Charjabug", "chuchmur":"Whismur", "cizayox":"Scizor",
-  "clamiral":"Samurott", "cleopsytra":"Espathra", "clic":"Klang", "cliticlic":"Klinklang",
-  "coatox":"Toxicroak", "cobaltium":"Cobalion", "cochignon":"Piloswine", "coconfort":"Kakuna",
-  "cocotine":"Aromatisse", "coiffeton":"Quaxly", "coleodome":"Dottler", "colhomard":"Crawdaunt",
-  "colimucus":"Sliggoo", "colombeau":"Tranquill", "colossinge":"Primeape", "compagnol":"Tandemaus",
-  "concombaffe":"Pyukumuku", "coquiperl":"Clamperl", "corayome":"Cursola", "corayon":"Corsola",
-  "corboss":"Honchkrow", "cornebre":"Murkrow", "corvaillus":"Corviknight", "cosmog":"Cosmog",
-  "cosmovum":"Cosmoem", "cotovol":"Jumpluff", "couafarel":"Furfrou", "couaneton":"Ducklett",
-  "coudlangue":"Lickilicky", "coupenotte":"Axew", "courrousinge":"Annihilape", "couverdure":"Swadloon",
-  "coxy":"Ledyba", "coxyclaque":"Ledian", "crabagarre":"Crabrawler", "crabaraque":"Crustle",
-  "crabicoque":"Dwebble", "crabominable":"Crabominable", "cradopaud":"Croagunk", "craparoi":"Klawf",
-  "crapustule":"Seismitoad", "crefadet":"Azelf", "crefollet":"Mesprit", "crehelf":"Uxie",
-  "cremy":"Milcery", "cresselia":"Cresselia", "crikzik":"Kricketot", "croaporal":"Frogadier",
-  "crocogil":"Croconaw", "crocogril":"Crocalor", "crocorible":"Krookodile", "crocrodil":"Croconaw",
-  "croquine":"Bounsweet", "crustabri":"Cloyster", "cryodo":"Arctibax", "cryptero":"Sigilyph",
-  "cupcanaille":"Slurpuff", "dardargnan":"Beedrill", "darkrai":"Darkrai", "darumacho":"Darmanitan",
-  "darumarond":"Darumaka", "debugant":"Tyrogue", "dedenne":"Dedenne", "deflaisan":"Unfezant",
-  "delcatty":"Delcatty", "delestin":"Veluza", "demanta":"Mantine", "demeteros":"Landorus",
-  "demolosse":"Houndoom", "denticrisse":"Bruxish", "deoxys":"Deoxys", "desseliande":"Trevenant",
-  "deusolourdo":"Dudunsparce", "dewgong":"Dewgong", "dialga":"Dialga", "diamat":"Zweilous",
-  "diancie":"Diancie", "dimocles":"Doublade", "dimoret":"Weavile", "dinglu":"Ting-Lu",
-  "dinoclier":"Shieldon", "dispareptil":"Drakloak", "dodoala":"Komala", "dodrio":"Dodrio",
-  "doduo":"Doduo", "dofin":"Finizen", "dogrino":"Mabosstiff", "dolman":"Stonjourner",
-  "donphan":"Donphan", "doudouvet":"Cottonee", "draby":"Bagon", "dracaufeu":"Charizard",
-  "drackhaus":"Shelgon", "draco":"Dragonair", "dracolosse":"Dragonite", "dragmara":"Aurorus",
-  "draieul":"Drampa", "drakkarmin":"Druddigon", "drascore":"Drapion", "dratatin":"Appletun",
-  "drattak":"Salamence", "dunaconda":"Sandaconda", "dunaja":"Silicobra", "duralugon":"Duraludon",
-  "dynavolt":"Electrike", "ecaid":"Hakamo-o", "ecayon":"Finneon", "ecrapince":"Corphish",
-  "ecremeuh":"Miltank", "ectoplasma":"Gengar", "effleche":"Dartrix", "ekaiser":"Kommo-o",
-  "elecsprint":"Manectric", "electhor":"Zapdos", "electrode":"Electrode", "elekable":"Electivire",
-  "elekid":"Elekid", "elektek":"Electabuzz", "embrochet":"Arrokuda", "embrylex":"Larvitar",
-  "emolga":"Emolga", "empiflor":"Victreebel", "engloutyran":"Guzzlord", "entei":"Entei",
-  "eoko":"Chimecho", "epine-de-fer":"Iron Thorns", "escargaume":"Shelmet", "escroco":"Krokorok",
-  "eternatus":"Eternatus", "ethernatos":"Eternatus", "etouraptor":"Staraptor", "etourmi":"Starly",
-  "etourvol":"Staravia", "evoli":"Eevee", "exagide":"Aegislash", "excavarenne":"Diggersby",
-  "excelangue":"Lickitung", "famignol":"Maushold", "fantominus":"Gastly", "fantyrm":"Dreepy",
-  "farfaduvet":"Whimsicott", "farfuret":"Sneasel", "farfurex":"Sneasler", "farigiraf":"Farigiraf",
-  "favianos":"Fezandipiti", "felicanis":"Okidogi", "felinferno":"Incineroar", "ferasinge":"Mankey",
-  "ferdeter":"Orthworm", "fermite":"Durant", "ferosinge":"Mankey", "feu-percant":"Gouging Fire",
-  "feuforeve":"Misdreavus", "feuillajou":"Pansage", "feuiloutan":"Simisage", "feunard":"Ninetales",
-  "feunnec":"Fennekin", "feurisson":"Quilava", "filentrappe":"Spidops", "flabebe":"Flabébé",
-  "flagadoss":"Slowbro", "flamajou":"Pansear", "flambino":"Scorbunny", "flambusard":"Talonflame",
-  "flamenroule":"Flamigo", "flamiaou":"Litten", "flamigator":"Skeledirge", "flamoutan":"Simisear",
-  "flingouste":"Clauncher", "flobio":"Marshtomp", "floette":"Floette", "floramantis":"Lurantis",
-  "floravol":"Skiploom", "floreclat":"Glimmora", "florges":"Florges", "florizarre":"Venusaur",
-  "flotajou":"Panpour", "flotillon":"Flittle", "flotoutan":"Simipour", "flotte-meche":"Flutter Mane",
-  "fluvetin":"Spritzee", "fongus-furie":"Brute Bonnet", "foretress":"Forretress", "forgelina":"Tinkaton",
-  "forgella":"Tinkatuff", "forgerette":"Tinkatink", "fort-ivoire":"Great Tusk", "fortusimia":"Munkidori",
-  "fouinar":"Furret", "fouinette":"Sentret", "fourbelin":"Morgrem", "fragilady":"Lilligant",
-  "fragroin":"Oinkologne", "frigodo":"Frigibax", "frison":"Bouffalant", "frissonille":"Snom",
-  "froussardine":"Wishiwashi", "fulgudog":"Boltund", "fulgulairo":"Kilowattrel", "fulguris":"Thundurus",
-  "funecire":"Litwick", "furaiglon":"Rufflet", "galegon":"Lairon", "galekid":"Aron",
-  "galeking":"Aggron", "galifeu":"Combusken", "gallame":"Gallade", "galopa":"Rapidash",
-  "galvagla":"Arctozolt", "galvagon":"Dracozolt", "galvaran":"Helioptile", "gambex":"Lokix",
-  "gamblast":"Clawitzer", "garchomp":"Garchomp", "garde-de-fer":"Iron Valiant", "gardevoir":"Gardevoir",
-  "gaulet":"Amoonguss", "genesect":"Genesect", "geolithe":"Boldore", "germeclat":"Glimmet",
-  "germignon":"Chikorita", "gigalithe":"Gigalith", "gigansel":"Garganacl", "girafarig":"Girafarig",
-  "giratina":"Giratina", "givrali":"Glaceon", "glaivodo":"Baxcalibur", "gloupti":"Gulpin",
-  "gobou":"Mudkip", "goelise":"Wingull", "goinfrex":"Munchlax", "golemastoc":"Golurk",
-  "golgopathe":"Barbaracle", "gorythmic":"Rillaboom", "goupelin":"Delphox", "goupilou":"Nickit",
-  "goupix":"Vulpix", "gourmelet":"Lechonk", "gouroutan":"Oranguru", "grahyena":"Mightyena",
-  "grainipiot":"Seedot", "granbull":"Granbull", "granivol":"Hoppip", "gravalanch":"Graveler",
-  "grelacon":"Bergmite", "grenousse":"Froakie", "gribouraigne":"Shroodle", "griknot":"Gible",
-  "grillepattes":"Sizzlipede", "grimalin":"Impidimp", "grindur":"Ferroseed", "gringolem":"Golett",
-  "grodoudou":"Wigglytuff", "grodrive":"Drifblim", "grolem":"Golem", "gromago":"Gholdengo",
-  "grondogue":"Maschiff", "groret":"Grumpig", "grotadmorv":"Muk", "grotichon":"Pignite",
-  "groudon":"Groudon", "gruikui":"Tepig", "gueriaigle":"Braviary", "guerilande":"Comfey",
-  "hachecateur":"Kleavor", "hariyama":"Hariyama", "hastacuda":"Barraskewda", "haydaim":"Sawsbuck",
-  "heatran":"Heatran", "heledelle":"Swellow", "heliatronc":"Sunflora", "helionceau":"Litleo",
-  "herbizarre":"Ivysaur", "hericendre":"Cyndaquil", "hexadron":"Falinks", "hexagel":"Cryogonal",
-  "hippodocus":"Hippowdon", "hippopotas":"Hippopotas", "ho-oh":"Ho-Oh", "hoopa":"Hoopa",
-  "hoothoot":"Hoothoot", "hotte-de-fer":"Iron Bundle", "hurle-queue":"Scream Tail", "hydragla":"Arctovish",
-  "hydragon":"Dracovish", "hypnomade":"Hypno", "hypocean":"Seadra", "hyporoi":"Kingdra",
-  "hypotelec":"Horsea", "hypotrempe":"Horsea", "iguolta":"Heliolisk", "incisache":"Fraxure",
-  "insecateur":"Scyther", "insecteur":"Scyther", "insolourdo":"Dunsparce", "intereon":"Inteleon",
-  "ire-foudre":"Raging Bolt", "ixon":"Obstagoon", "jirachi":"Jirachi", "joliflor":"Bellossom",
-  "judokrak":"Throh", "jungko":"Sceptile", "kabuto":"Kabuto", "kabutops":"Kabutops",
-  "kadabra":"Kadabra", "kaiminus":"Totodile", "kaimorse":"Walrein", "kangourex":"Kangaskhan",
-  "kaorine":"Claydol", "kapoera":"Hitmontop", "karaclee":"Sawk", "katagami":"Kartana",
-  "kecleon":"Kecleon", "keldeo":"Keldeo", "keunotor":"Bidoof", "khelocrok":"Chewtle",
-  "kicklee":"Hitmonlee", "kirlia":"Kirlia", "kokiyas":"Shellder", "koraidon":"Koraidon",
-  "korillon":"Chingling", "krabboss":"Kingler", "krabby":"Krabby", "kraknoix":"Trapinch",
-  "krakos":"Grapploct", "kranidos":"Cranidos", "kravarech":"Dragalge", "krocorible":"Krookodile",
-  "kungfouine":"Mienfoo", "kyogre":"Kyogre", "kyurem":"Kyurem", "laggron":"Swampert",
-  "lainergie":"Flaaffy", "lakmecygne":"Swanna", "lakmegarde":"Swanna", "lamantine":"Dewgong",
-  "lamperoie":"Eelektrik", "lampignon":"Shiinotic", "lancargot":"Escavalier", "lanssorien":"Dragapult",
-  "lanturn":"Lanturn", "laporeille":"Buneary", "lapyro":"Raboot", "larmeleon":"Sobble",
-  "larvadar":"Blipbug", "larveyette":"Sewaddle", "larvibule":"Grubbin", "latias":"Latias",
-  "latios":"Latios", "leboulerou":"Rellor", "leopardus":"Liepard", "lepidonille":"Scatterbug",
-  "lestombaile":"Bombirdier", "leuphorie":"Blissey", "leveinard":"Chansey", "leviator":"Gyarados",
-  "lewsor":"Elgyem", "lezargus":"Inteleon", "lianaja":"Servine", "lianjoue":"Servine",
-  "libegon":"Flygon", "lilia":"Lileep", "lilliterelle":"Nymble", "limagma":"Slugma",
-  "limaspeed":"Accelgor", "limonde":"Stunfisk", "lineon":"Linoone", "lippouti":"Smoochum",
-  "lippoutou":"Jynx", "lixy":"Shinx", "lockpin":"Lopunny", "lokhlass":"Lapras",
-  "lombre":"Lombre", "lougaroc":"Lycanroc", "loupio":"Chinchou", "lovdisc":"Luvdisc",
-  "lucanon":"Vikavolt", "lucario":"Lucario", "ludicolo":"Ludicolo", "lugia":"Lugia",
-  "lugulabre":"Chandelure", "lumineon":"Lumineon", "lumivole":"Illumise", "lunala":"Lunala",
-  "luxio":"Luxio", "luxray":"Luxray", "m. glaquette":"Mr. Rime", "m. mime":"Mr. Mime",
-  "machoc":"Machop", "machopeur":"Machoke", "mackogneur":"Machamp", "macronium":"Bayleef",
-  "maganon":"Magmortar", "magby":"Magby", "magearna":"Magearna", "magicarpe":"Magikarp",
-  "magireve":"Mismagius", "magmar":"Magmar", "magneti":"Magnemite", "magneton":"Magneton",
-  "magnezone":"Magnezone", "majaspic":"Serperior", "makuhita":"Makuhita", "malamandre":"Salazzle",
-  "malosse":"Houndour", "malvalame":"Ceruledge", "mamanbo":"Alomomola", "mammochon":"Mamoswine",
-  "manaphy":"Manaphy", "mandrillon":"Naganadel", "manglouton":"Yungoos", "mangriff":"Zangoose",
-  "manternel":"Leavanny", "manzai":"Bonsly", "maracachi":"Maractus", "maraiste":"Quagsire",
-  "marcacrin":"Swinub", "marill":"Marill", "marisson":"Chespin", "marshadow":"Marshadow",
-  "mascaiman":"Sandile", "maskadra":"Masquerain", "massko":"Grovyle", "mastouffe":"Stoutland",
-  "mateloutre":"Dewott", "matoufeu":"Torracat", "matourgeon":"Floragato", "medhyena":"Poochyena",
-  "meditikka":"Meditite", "meganium":"Meganium", "megapagos":"Carracosta", "meios":"Duosion",
-  "melancolux":"Lampent", "melmetal":"Melmetal", "melo":"Cleffa", "melodelfe":"Clefable",
-  "meloetta":"Meloetta", "melofee":"Clefairy", "melokrik":"Kricketune", "meltan":"Meltan",
-  "mentali":"Espeon", "mesmerella":"Gothorita", "metalosse":"Metagross", "metamorph":"Ditto",
-  "metang":"Metang", "meteno":"Minior", "mew":"Mew", "mewtwo":"Mewtwo",
-  "miamiasme":"Trubbish", "miaouss":"Meowth", "miascarade":"Meowscarada", "miasmax":"Garbodor",
-  "migalos":"Ariados", "milobellus":"Milotic", "mimantis":"Fomantis", "mime jr.":"Mime Jr.",
-  "mimigal":"Spinarak", "mimiqui":"Mimikyu", "mimitoss":"Venonat", "minidraco":"Dratini",
-  "minisange":"Rookidee", "minotaupe":"Excadrill", "miradar":"Watchog", "miraidon":"Miraidon",
-  "mistigrix":"Meowstic", "mite-de-fer":"Iron Moth", "momartik":"Froslass", "monaflemit":"Slaking",
-  "monorpale":"Honedge", "monthracite":"Coalossal", "mordudor":"Gimmighoul", "morpeko":"Morpeko",
-  "morpheo":"Castform", "motisma":"Rotom", "motorizard":"Cyclizar", "moufflair":"Skuntank",
-  "moufouette":"Stunky", "moumouflon":"Dubwool", "moumouton":"Wooloo", "mouscoto":"Buzzwole",
-  "moustillon":"Oshawott", "moyade":"Jellicent", "muciole":"Volbeat", "mucuscule":"Goomy",
-  "munja":"Shedinja", "munna":"Munna", "muplodocus":"Goodra", "mushana":"Musharna",
-  "mustebouee":"Buizel", "musteflott":"Floatzel", "mygavolt":"Galvantula", "mysdibule":"Mawile",
-  "mystherbe":"Oddish", "nanmeouie":"Audino", "natu":"Natu", "necrozma":"Necrozma",
-  "negapi":"Minun", "neitram":"Beheeyem", "nemelios":"Pyroar", "nenupiot":"Lotad",
-  "nidoking":"Nidoking", "nidoqueen":"Nidoqueen", "nidoran":"Nidoran", "nidorina":"Nidorina",
-  "nidorino":"Nidorino", "nigirigon":"Tatsugiri", "nigosier":"Cramorant", "ningale":"Nincada",
-  "ninjask":"Ninjask", "nirondelle":"Taillow", "noacier":"Ferrothorn", "noadkoko":"Exeggutor",
-  "noarfang":"Noctowl", "noctali":"Umbreon", "noctunoir":"Dusknoir", "nodulithe":"Roggenrola",
-  "noeunoeuf":"Exeggcute", "nosferalto":"Golbat", "nosferapti":"Zubat", "nostenfer":"Crobat",
-  "nounourson":"Stufful", "nucleos":"Solosis", "nymphali":"Sylveon", "obalie":"Spheal",
-  "octillery":"Octillery", "ogeko":"Gecqua", "ogerpon":"Ogerpon", "ohmassacre":"Eelektross",
-  "okeoke":"Wynaut", "olivado":"Dolliv", "olivini":"Smoliv", "oniglali":"Glalie",
-  "onix":"Onix", "opermine":"Binacle", "oratoria":"Primarina", "ortide":"Gloom",
-  "ossatueur":"Marowak", "osselait":"Cubone", "otaquin":"Popplio", "otaria":"Seel",
-  "otarlet":"Brionne", "otarlette":"Brionne", "ouistempo":"Grookey", "ouisticram":"Chimchar",
-  "ouvrifier":"Gurdurr", "oyacata":"Dondozo", "pachirisu":"Pachirisu", "pachyradjah":"Copperajah",
-  "palarticho":"Sirfetch'd", "palkia":"Palkia", "palmaval":"Quaquaval", "pandarbare":"Pangoro",
-  "pandespiegle":"Pancham", "papilord":"Mothim", "papilusion":"Butterfree", "papinox":"Dustox",
-  "paragruel":"Basculegion", "paras":"Paras", "parasect":"Parasect", "parecool":"Slakoth",
-  "pashmilla":"Cinccino", "passerouge":"Fletchling", "patachiot":"Fidough", "paume-de-fer":"Iron Hands",
-  "pechaminus":"Pecharunt", "pelage-sable":"Sandy Shocks", "peregrain":"Spewpa", "persian":"Persian",
-  "phanpy":"Phanpy", "pharamp":"Ampharos", "phione":"Phione", "phogleur":"Sealeo",
-  "phyllali":"Leafeon", "piafabec":"Spearow", "picassaut":"Pikipek", "pichu":"Pichu",
-  "piclairon":"Trumbeak", "pierroteknik":"Blacephalon", "pietace":"Cetoddle", "pifeuil":"Nuzleaf",
-  "pijako":"Chatot", "pikachu":"Pikachu", "pimito":"Capsakid", "pingoleon":"Empoleon",
-  "pitrouille":"Pumpkaboo", "plumeline":"Oricorio", "pohm":"Pawmi", "pohmarmotte":"Pawmot",
-  "pohmotte":"Pawmo", "poichigeon":"Pidove", "poissirene":"Goldeen", "poissoroy":"Seaking",
-  "polagriffe":"Beartic", "polarhume":"Cubchoo", "polichombr":"Shuppet", "poltchageist":"Poltchageist",
-  "polthegeist":"Polteageist", "pomdepik":"Pineco", "pomdorochi":"Hydrapple", "pomdramour":"Dipplin",
-  "pomdrapi":"Flapple", "ponchien":"Herdier", "ponchiot":"Lillipup", "pondralugon":"Archaludon",
-  "ponyta":"Ponyta", "porygon":"Porygon", "porygon-z":"Porygon-Z", "porygon2":"Porygon2",
-  "posipi":"Plusle", "poulpaf":"Clobbopus", "poussacha":"Sprigatito", "poussifeu":"Torchic",
-  "predasterie":"Toxapex", "primarina":"Primarina", "prinplouf":"Prinplup", "prismillon":"Vivillon",
-  "psykokwak":"Psyduck", "psystigri":"Espurr", "ptera":"Aerodactyl", "ptiravi":"Happiny",
-  "ptitard":"Poliwag", "ptyranidur":"Tyrunt", "pyonille":"Larvesta", "pyrax":"Volcarona",
-  "pyrobut":"Cinderace", "pyroli":"Flareon", "pyronille":"Larvesta", "quartermac":"Passimian",
-  "queulorior":"Smeargle", "qulbutoke":"Wobbuffet", "qwilfish":"Qwilfish", "qwilpik":"Overqwil",
-  "racaillou":"Geodude", "rafflesia":"Vileplume", "raichu":"Raichu", "raikou":"Raikou",
-  "ramboum":"Loudred", "ramoloss":"Slowpoke", "rampe-ailes":"Slither Wing", "rapasdepic":"Fearow",
-  "rapion":"Skorupi", "ratentif":"Patrat", "rattata":"Rattata", "rattatac":"Raticate",
-  "rayquaza":"Rayquaza", "regice":"Regice", "regidrago":"Regidrago", "regieleki":"Regieleki",
-  "regigigas":"Regigigas", "regirock":"Regirock", "registeel":"Registeel", "relicanth":"Relicanth",
-  "remoraid":"Remoraid", "reptincel":"Charmeleon", "reshiram":"Reshiram", "rexillius":"Tyrantrum",
-  "rhinastoc":"Rhyperior", "rhinocorne":"Rhyhorn", "rhinoferos":"Rhydon", "rhinolove":"Swoobat",
-  "riolu":"Riolu", "roc-de-fer":"Iron Boulder", "rocabot":"Rockruff", "roigada":"Slowking",
-  "roitiflam":"Emboar", "roitiflor":"Emboar", "rondoudou":"Jigglypuff", "ronflex":"Snorlax",
-  "rongourmand":"Skwovet", "rongrigou":"Greedent", "rosabyss":"Gorebyss", "roselia":"Roselia",
-  "roserade":"Roserade", "rototaupe":"Drilbur", "roublenard":"Thievul", "roucarnage":"Pidgeot",
-  "roucool":"Pidgey", "roucoups":"Pidgeotto", "roue-de-fer":"Iron Treads", "roussil":"Braixen",
-  "rozbouton":"Budew", "rubombelle":"Ribombee", "rugit-lune":"Roaring Moon", "sabelette":"Sandshrew",
-  "sablaireau":"Sandslash", "salameche":"Charmander", "salarsen":"Toxtricity", "sancoki":"Shellos",
-  "sapereau":"Bunnelby", "saquedeneu":"Tangela", "sarmurai":"Golisopod", "scalpereur":"Kingambit",
-  "scalpion":"Pawniard", "scalproie":"Bisharp", "scarabrute":"Pinsir", "scarhino":"Heracross",
-  "scobolide":"Whirlipede", "scolocendre":"Centiskorch", "scorplane":"Gligar", "scorvol":"Gliscor",
-  "scovilain":"Scovillain", "scrutella":"Gothita", "seleroc":"Lunatone", "selutin":"Nacli",
-  "sepiatop":"Inkay", "sepiatroce":"Malamar", "seracrawl":"Avalugg", "serpang":"Huntail",
-  "serpente-eau":"Walking Wake", "seviper":"Seviper", "shaofouine":"Mienshao", "sharpedo":"Sharpedo",
-  "shaymin":"Shaymin", "shifours":"Urshifu", "siderella":"Gothitelle", "silvallie":"Silvally",
-  "simiabraz":"Infernape", "simularbre":"Sudowoodo", "sinistrail":"Dhelmise", "skelenox":"Duskull",
-  "skitty":"Skitty", "smogo":"Koffing", "smogogo":"Weezing", "snubbull":"Snubbull",
-  "solaroc":"Solrock", "solgaleo":"Solgaleo", "solochi":"Deino", "sonistrelle":"Noibat",
-  "soporifik":"Drowzee", "sorbebe":"Vanillite", "sorbouboul":"Vanilluxe", "sorboul":"Vanillish",
-  "sorcilence":"Hatterene", "sovkipou":"Wimpod", "spectreval":"Spectrier", "spectrum":"Haunter",
-  "spinda":"Spinda", "spiritomb":"Spiritomb", "spododo":"Morelull", "spoink":"Spoink",
-  "stalgamin":"Snorunt", "stari":"Staryu", "staross":"Starmie", "statitik":"Joltik",
-  "steelix":"Steelix", "strassie":"Carbink", "sucreine":"Tsareena", "sucroquin":"Swirlix",
-  "suicune":"Suicune", "sulfura":"Moltres", "superdofin":"Palafin", "sylveroy":"Calyrex",
-  "symbios":"Reuniclus", "tadmorv":"Grimer", "tag-tag":"Grafaiai", "tapatoes":"Squawkabilly",
-  "tarenbulle":"Araquanid", "tarinor":"Nosepass", "tarinorme":"Probopass", "tarpaud":"Politoed",
-  "tarsal":"Ralts", "tartard":"Poliwrath", "taupikeau":"Wiglett", "taupiqueur":"Diglett",
-  "tauros":"Tauros", "teddiursa":"Teddiursa", "tenalice":"Shiftry", "tenefix":"Sableye",
-  "tengalice":"Shiftry", "tentacool":"Tentacool", "tentacruel":"Tentacruel", "teraclope":"Dusclops",
-  "terapagos":"Terapagos", "terhal":"Beldum", "terracool":"Toedscool", "terracruel":"Toedscruel",
-  "terraiste":"Clodsire", "terrakium":"Terrakion", "tetampoule":"Tadbulb", "tetarte":"Poliwhirl",
-  "tetes-de-fer":"Iron Jugulis", "theffroi":"Sinistea", "theffroyable":"Sinistcha", "tiboudet":"Mudbray",
-  "tic":"Klink", "tiplouf":"Piplup", "tissenboule":"Tarountula", "togedemaru":"Togedemaru",
-  "togekiss":"Togekiss", "togepi":"Togepi", "togetic":"Togetic", "tokopisco":"Tapu Fini",
-  "tokopiyon":"Tapu Lele", "tokorico":"Tapu Koko", "tokotoro":"Tapu Bulu", "tomberro":"Houndstone",
-  "torgamord":"Drednaw", "tortank":"Blastoise", "torterra":"Torterra", "tortipouss":"Turtwig",
-  "toudoudou":"Igglybuff", "tournegrin":"Sunkern", "tournicoton":"Gossifleur", "toutombe":"Greavard",
-  "toxizap":"Toxel", "tranchodon":"Haxorus", "trepassable":"Palossand", "triopikeau":"Wugtrio",
-  "triopikeur":"Dugtrio", "trioxhydre":"Hydreigon", "tritonde":"Tympole", "tritosor":"Gastrodon",
-  "tritox":"Salandit", "trompignon":"Foongus", "tropius":"Tropius", "trousselin":"Klefki",
-  "tutafeh":"Yamask", "tutankafer":"Cofagrigus", "tutetekri":"Runerigus", "tygnon":"Hitmonchan",
-  "tylton":"Swablu", "type:0":"Type: Null", "typhlosion":"Typhlosion", "tyranocif":"Tyranitar",
-  "ursaking":"Ursaluna", "ursaring":"Ursaring", "vacilys":"Cradily", "vaututrice":"Mandibuzz",
-  "vemini":"Poipole", "venalgue":"Skrelp", "venipatte":"Venipede", "verpom":"Applin",
-  "vert-de-fer":"Iron Leaves", "vibraninf":"Vibrava", "victini":"Victini", "vigoroth":"Vigoroth",
-  "vipelierre":"Snivy", "viperoue":"Snivy", "virevorreur":"Brambleghast", "viridium":"Virizion",
-  "virovent":"Bramblin", "viskuse":"Frillish", "vivaldaim":"Deerling", "volcanion":"Volcanion",
-  "volcaropod":"Magcargo", "voltali":"Jolteon", "voltorbe":"Voltorb", "voltoutou":"Yamper",
-  "vorasterie":"Mareanie", "vortente":"Carnivine", "vostourno":"Vullaby", "vrombi":"Varoom",
-  "vrombotor":"Revavroom", "wagomine":"Carkol", "wailmer":"Wailmer", "wailord":"Wailord",
-  "wattapik":"Pincurchin", "wattouat":"Mareep", "wimessir":"Indeedee", "wushours":"Kubfu",
-  "xatu":"Xatu", "xerneas":"Xerneas", "yanma":"Yanma", "yanmega":"Yanmega",
-  "ymphect":"Pupitar", "yuyu":"Chi-Yu", "yveltal":"Yveltal", "zacian":"Zacian",
-  "zamazenta":"Zamazenta", "zapetrel":"Wattrel", "zarbi":"Unown", "zarude":"Zarude",
-  "zebibron":"Blitzle", "zeblitz":"Zebstrika", "zekrom":"Zekrom", "zeraora":"Zeraora",
-  "zeroid":"Nihilego", "zigzaton":"Zigzagoon", "zoroark":"Zoroark", "zorua":"Zorua",
-  "zygarde":"Zygarde"
-};
-const FR_SETS = {
-  "edition de base":"Base", "base":"Base", "jungle":"Jungle", "fossile":"Fossil",
-  "equipe rocket":"Team Rocket", "rocket":"Team Rocket",
-  "gym heroes":"Gym Heroes", "gym challenge":"Gym Challenge",
-  "neo genese":"Neo Genesis", "neo decouverte":"Neo Discovery",
-  "neo revolution":"Neo Revelation", "neo destin":"Neo Destiny",
-  "expedition":"Expedition", "aquapolis":"Aquapolis", "skyridge":"Skyridge",
-  "ex rubis saphir":"EX Ruby & Sapphire", "ex":"EX",
-  "team magma":"Team Magma", "team aqua":"Team Aqua",
-  "plage des secrets":"Hidden Fates",
-  "epee et bouclier":"Sword & Shield", "epée et bouclier":"Sword & Shield",
-  "vif argent":"Silver Tempest", "origines antiques":"Ancient Origins",
-  "tumulte astral":"Astral Radiance", "brillant stars":"Brilliant Stars",
-  "couronnement":"Crown Zenith", "obsidienne":"Obsidian Flames",
-  "paradoxe temporel":"Temporal Forces", "destinees de paldea":"Paldean Fates",
+let ui = {
+  results: [], resultsLoading: false,
+  coll: [], // {id,name,setName,rarity,number,image,finish,qty,price,priceDate,source,photo}
+  filters: { q: "", finish: "", sort: "name" },
+  busy: false
 };
 
-function translateQuery(raw) {
-  const n = norm(raw);
-  if (FR_POKE[n]) return FR_POKE[n];
-  for (const fr of Object.keys(FR_POKE)) {
-    if (n === fr || n.startsWith(fr + " ")) return FR_POKE[fr] + raw.slice(fr.length);
-  }
-  const m = n.match(/^(.+?)\s+(edition de base|base|jungle|fossile|equipe rocket|neo genese|neo decouverte|neo revolution|neo destin)$/);
-  if (m) {
-    const namePart = FR_POKE[m[1]] || m[1];
-    const setPart = FR_SETS[m[2]];
-    if (setPart) return 'name:"' + namePart + '" set.name:"' + setPart + '"';
-  }
-  if (n.includes("set.name:")) {
-    let out = raw, done = false;
-    for (const fr of Object.keys(FR_SETS)) {
-      const re = new RegExp('set.name:"?' + fr + '"?', "i");
-      if (re.test(out)) { out = out.replace(re, 'set.name:"' + FR_SETS[fr] + '"'); done = true; }
-    }
-    return done ? out : null;
-  }
-  return null;
+const $ = id => document.getElementById(id);
+function toast(msg, err) {
+  const t = $("toast"); t.textContent = msg;
+  t.style.borderColor = err ? "var(--bad)" : "var(--acc)";
+  t.classList.add("on"); setTimeout(() => t.classList.remove("on"), 2600);
 }
-function suggestFr(q, max) {
-  const n = norm(q); if (n.length < 3) return [];
-  const out = [];
-  for (const fr of Object.keys(FR_POKE)) {
-    if (fr !== n && (fr.startsWith(n.slice(0, 3)) || (n.length >= 4 && fr.includes(n)))) {
-      out.push(fr + " (" + FR_POKE[fr] + ")");
-      if (out.length >= (max || 3)) break;
-    }
-  }
-  return [...new Set(out)];
+function status(id, msg, cls) { const el = $(id); el.textContent = msg || ""; el.className = "status" + (cls ? " " + cls : ""); }
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+function fmtDate(iso) { if (!iso) return "—"; try { return new Date(iso).toLocaleDateString("fr-FR"); } catch { return "—"; } }
+function eur(n) { return (n == null) ? "—" : n.toLocaleString("fr-FR", { style: "currency", currency: "EUR" }); }
+function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(ui.coll)); } catch(e) { toast("Stockage plein (photos ?)", true); } }
+function load() { try { const raw = localStorage.getItem(LS_KEY); if (raw) ui.coll = JSON.parse(raw) || []; } catch {} }
+function imgUrl(base) { return (base || "") + ".png"; }
+
+// ---------- API ----------
+async function jfetch(url) {
+  const r = await fetch(url, { headers: { "Accept": "application/json" } });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
 }
 
-// ---------- Affichage en français (reverse du dictionnaire) ----------
-const SMALL_WORDS = new Set(["et", "de", "des", "du", "la", "le", "les", "au", "aux", "a"]);
-const prettify = (s) => s.split(" ").map((w, i) => {
-  if (!w) return w;
-  if (i > 0 && SMALL_WORDS.has(w)) return w;
-  return w.charAt(0).toUpperCase() + w.slice(1);
-}).join(" ");
-const FR_DISPLAY = {
-  "Abomasnow":"Blizzaroi", "Abra":"Abra", "Absol":"Absol", "Accelgor":"Limaspeed",
-  "Aegislash":"Exagide", "Aerodactyl":"Ptéra", "Aggron":"Galeking", "Aipom":"Capumain",
-  "Alakazam":"Alakazam", "Alcremie":"Charmilly", "Alomomola":"Mamanbo", "Altaria":"Altaria",
-  "Amaura":"Amagara", "Ambipom":"Capidextre", "Amoonguss":"Gaulet", "Ampharos":"Pharamp",
-  "Annihilape":"Courrousinge", "Anorith":"Anorith", "Appletun":"Dratatin", "Applin":"Verpom",
-  "Araquanid":"Tarenbulle", "Arbok":"Arbok", "Arboliva":"Arboliva", "Arcanine":"Arcanin",
-  "Arceus":"Arceus", "Archaludon":"Pondralugon", "Archen":"Arkéapti", "Archeops":"Aéroptéryx",
-  "Arctibax":"Cryodo", "Arctovish":"Hydragla", "Arctozolt":"Galvagla", "Ariados":"Migalos",
-  "Armaldo":"Armaldo", "Armarouge":"Carmadura", "Aromatisse":"Cocotine", "Aron":"Galekid",
-  "Arrokuda":"Embrochet", "Articuno":"Artikodin", "Audino":"Nanméouïe", "Aurorus":"Dragmara",
-  "Avalugg":"Séracrawl", "Axew":"Coupenotte", "Azelf":"Créfadet", "Azumarill":"Azumarill",
-  "Azurill":"Azurill", "Bagon":"Draby", "Baltoy":"Balbuto", "Banette":"Branette",
-  "Barbaracle":"Golgopathe", "Barboach":"Barloche", "Barraskewda":"Hastacuda", "Basculegion":"Paragruel",
-  "Basculin":"Bargantua", "Bastiodon":"Bastiodon", "Baxcalibur":"Glaivodo", "Bayleef":"Macronium",
-  "Beartic":"Polagriffe", "Beautifly":"Charmillon", "Beedrill":"Dardargnan", "Beheeyem":"Neitram",
-  "Beldum":"Terhal", "Bellibolt":"Ampibidou", "Bellossom":"Joliflor", "Bellsprout":"Chétiflor",
-  "Bergmite":"Grelaçon", "Bewear":"Chelours", "Bibarel":"Castorno", "Bidoof":"Keunotor",
-  "Binacle":"Opermine", "Bisharp":"Scalproie", "Blacephalon":"Pierroteknik", "Blastoise":"Tortank",
-  "Blaziken":"Braségali", "Blipbug":"Larvadar", "Blissey":"Leuphorie", "Blitzle":"Zébibron",
-  "Boldore":"Géolithe", "Boltund":"Fulgudog", "Bombirdier":"Lestombaile", "Bonsly":"Manzaï",
-  "Bouffalant":"Frison", "Bounsweet":"Croquine", "Braixen":"Roussil", "Brambleghast":"Virevorreur",
-  "Bramblin":"Virovent", "Braviary":"Gueriaigle", "Breloom":"Chapignon", "Brionne":"Otarlette",
-  "Bronzong":"Archéodong", "Bronzor":"Archéomire", "Browt":"Broussatif", "Brute Bonnet":"Fongus-Furie",
-  "Bruxish":"Denticrisse", "Budew":"Rozbouton", "Buizel":"Mustébouée", "Bulbasaur":"Bulbizarre",
-  "Buneary":"Laporeille", "Bunnelby":"Sapereau", "Burmy":"Cheniti", "Butterfree":"Papilusion",
-  "Buzzwole":"Mouscoto", "Cacnea":"Cacnea", "Cacturne":"Cacturne", "Calyrex":"Sylveroy",
-  "Camerupt":"Camérupt", "Capsakid":"Pimito", "Carbink":"Strassie", "Carkol":"Wagomine",
-  "Carnivine":"Vortente", "Carracosta":"Mégapagos", "Carvanha":"Carvanha", "Cascoon":"Blindalys",
-  "Castform":"Morphéo", "Caterpie":"Chenipan", "Celebi":"Celebi", "Celesteela":"Bamboiselle",
-  "Centiskorch":"Scolocendre", "Ceruledge":"Malvalame", "Cetitan":"Balbalèze", "Cetoddle":"Piétacé",
-  "Chandelure":"Lugulabre", "Chansey":"Leveinard", "Charcadet":"Charbambin", "Charizard":"Dracaufeu",
-  "Charjabug":"Chrysapile", "Charmander":"Salamèche", "Charmeleon":"Reptincel", "Chatot":"Pijako",
-  "Cherrim":"Ceriflor", "Cherubi":"Ceribou", "Chesnaught":"Blindépique", "Chespin":"Marisson",
-  "Chewtle":"Khélocrok", "Chi-Yu":"Yuyu", "Chien-Pao":"Baojian", "Chikorita":"Germignon",
-  "Chimchar":"Ouisticram", "Chimecho":"Éoko", "Chinchou":"Loupio", "Chingling":"Korillon",
-  "Cinccino":"Pashmilla", "Cinderace":"Pyrobut", "Clamperl":"Coquiperl", "Clauncher":"Flingouste",
-  "Clawitzer":"Gamblast", "Claydol":"Kaorine", "Clefable":"Mélodelfe", "Clefairy":"Mélofée",
-  "Cleffa":"Mélo", "Clobbopus":"Poulpaf", "Clodsire":"Terraiste", "Cloyster":"Crustabri",
-  "Coalossal":"Monthracite", "Cobalion":"Cobaltium", "Cofagrigus":"Tutankafer", "Combee":"Apitrini",
-  "Combusken":"Galifeu", "Comfey":"Guérilande", "Conkeldurr":"Bétochef", "Copperajah":"Pachyradjah",
-  "Corphish":"Écrapince", "Corsola":"Corayon", "Corviknight":"Corvaillus", "Corvisquire":"Bleuseille",
-  "Cosmoem":"Cosmovum", "Cosmog":"Cosmog", "Cottonee":"Doudouvet", "Crabominable":"Crabominable",
-  "Crabrawler":"Crabagarre", "Cradily":"Vacilys", "Cramorant":"Nigosier", "Cranidos":"Kranidos",
-  "Crawdaunt":"Colhomard", "Cresselia":"Cresselia", "Croagunk":"Cradopaud", "Crobat":"Nostenfer",
-  "Crocalor":"Crocogril", "Croconaw":"Crocrodil", "Crustle":"Crabaraque", "Cryogonal":"Hexagel",
-  "Cubchoo":"Polarhume", "Cubone":"Osselait", "Cufant":"Charibari", "Cursola":"Corayôme",
-  "Cutiefly":"Bombydou", "Cyclizar":"Motorizard", "Cyndaquil":"Héricendre", "Dachsbun":"Briochien",
-  "Darkrai":"Darkrai", "Darmanitan":"Darumacho", "Dartrix":"Efflèche", "Darumaka":"Darumarond",
-  "Decidueye":"Archéduc", "Dedenne":"Dedenne", "Deerling":"Vivaldaim", "Deino":"Solochi",
-  "Delcatty":"Delcatty", "Delibird":"Cadoizo", "Delphox":"Goupelin", "Deoxys":"Deoxys",
-  "Dewgong":"Lamantine", "Dewott":"Mateloutre", "Dewpider":"Araqua", "Dhelmise":"Sinistrail",
-  "Dialga":"Dialga", "Diancie":"Diancie", "Diggersby":"Excavarenne", "Diglett":"Taupiqueur",
-  "Dipplin":"Pomdramour", "Ditto":"Métamorph", "Dodrio":"Dodrio", "Doduo":"Doduo",
-  "Dolliv":"Olivado", "Dondozo":"Oyacata", "Donphan":"Donphan", "Dottler":"Coléodôme",
-  "Doublade":"Dimoclès", "Dracovish":"Hydragon", "Dracozolt":"Galvagon", "Dragalge":"Kravarech",
-  "Dragapult":"Lanssorien", "Dragonair":"Draco", "Dragonite":"Dracolosse", "Drakloak":"Dispareptil",
-  "Drampa":"Draïeul", "Drapion":"Drascore", "Dratini":"Minidraco", "Drednaw":"Torgamord",
-  "Dreepy":"Fantyrm", "Drifblim":"Grodrive", "Drifloon":"Baudrive", "Drilbur":"Rototaupe",
-  "Drizzile":"Arrozard", "Drowzee":"Soporifik", "Druddigon":"Drakkarmin", "Dubwool":"Moumouflon",
-  "Ducklett":"Couaneton", "Dudunsparce":"Deusolourdo", "Dugtrio":"Triopikeur", "Dunsparce":"Insolourdo",
-  "Duosion":"Méios", "Duraludon":"Duralugon", "Durant":"Fermite", "Dusclops":"Téraclope",
-  "Dusknoir":"Noctunoir", "Duskull":"Skelénox", "Dustox":"Papinox", "Dwebble":"Crabicoque",
-  "Eelektrik":"Lampéroie", "Eelektross":"Ohmassacre", "Eevee":"Évoli", "Eiscue":"Bekaglaçon",
-  "Ekans":"Abo", "Eldegoss":"Blancoton", "Electabuzz":"Élektek", "Electivire":"Élekable",
-  "Electrike":"Dynavolt", "Electrode":"Électrode", "Elekid":"Élekid", "Elgyem":"Lewsor",
-  "Emboar":"Roitiflam", "Emolga":"Emolga", "Empoleon":"Pingoléon", "Enamorus":"Amovénus",
-  "Entei":"Entei", "Escavalier":"Lançargot", "Espathra":"Cléopsytra", "Espeon":"Mentali",
-  "Espurr":"Psystigri", "Eternatus":"Éthernatos", "Excadrill":"Minotaupe", "Exeggcute":"Noeunoeuf",
-  "Exeggutor":"Noadkoko", "Exploud":"Brouhabam", "Falinks":"Hexadron", "Farfetch'd":"Canarticho",
-  "Farigiraf":"Farigiraf", "Fearow":"Rapasdepic", "Feebas":"Barpau", "Fennekin":"Feunnec",
-  "Feraligatr":"Aligatueur", "Ferroseed":"Grindur", "Ferrothorn":"Noacier", "Fezandipiti":"Favianos",
-  "Fidough":"Pâtachiot", "Finizen":"Dofin", "Finneon":"Écayon", "Flaaffy":"Lainergie",
-  "Flabébé":"Flabébé", "Flamigo":"Flamenroule", "Flapple":"Pomdrapi", "Flareon":"Pyroli",
-  "Fletchinder":"Braisillon", "Fletchling":"Passerouge", "Flittle":"Flotillon", "Floatzel":"Mustéflott",
-  "Floette":"Floette", "Floragato":"Matourgeon", "Florges":"Florges", "Flutter Mane":"Flotte-Mèche",
-  "Flygon":"Libégon", "Fomantis":"Mimantis", "Foongus":"Trompignon", "Forretress":"Foretress",
-  "Fraxure":"Incisache", "Frigibax":"Frigodo", "Frillish":"Viskuse", "Froakie":"Grenousse",
-  "Frogadier":"Croâporal", "Froslass":"Momartik", "Frosmoth":"Beldeneige", "Fuecoco":"Chochodile",
-  "Furfrou":"Couafarel", "Furret":"Fouinar", "Gabite":"Carmache", "Gallade":"Gallame",
-  "Galvantula":"Mygavolt", "Garbodor":"Miasmax", "Garchomp":"Carchacrok", "Gardevoir":"Gardevoir",
-  "Garganacl":"Gigansel", "Gastly":"Fantominus", "Gastrodon":"Tritosor", "Gecqua":"Ogéko",
-  "Genesect":"Genesect", "Gengar":"Ectoplasma", "Geodude":"Racaillou", "Gholdengo":"Gromago",
-  "Gible":"Griknot", "Gigalith":"Gigalithe", "Gimmighoul":"Mordudor", "Girafarig":"Girafarig",
-  "Giratina":"Giratina", "Glaceon":"Givrali", "Glalie":"Oniglali", "Glameow":"Chaglam",
-  "Glastrier":"Blizzeval", "Gligar":"Scorplane", "Glimmet":"Germéclat", "Glimmora":"Floréclat",
-  "Gliscor":"Scorvol", "Gloom":"Ortide", "Gogoat":"Chevroum", "Golbat":"Nosferalto",
-  "Goldeen":"Poissirène", "Golduck":"Akwakwak", "Golem":"Grolem", "Golett":"Gringolem",
-  "Golisopod":"Sarmuraï", "Golurk":"Golemastoc", "Goodra":"Muplodocus", "Goomy":"Mucuscule",
-  "Gorebyss":"Rosabyss", "Gossifleur":"Tournicoton", "Gothita":"Scrutella", "Gothitelle":"Sidérella",
-  "Gothorita":"Mesmérella", "Gouging Fire":"Feu-Perçant", "Gourgeist":"Banshitrouye", "Grafaiai":"Tag-Tag",
-  "Granbull":"Granbull", "Grapploct":"Krakos", "Graveler":"Gravalanch", "Great Tusk":"Fort-Ivoire",
-  "Greavard":"Toutombe", "Greedent":"Rongrigou", "Greninja":"Amphinobi", "Grimer":"Tadmorv",
-  "Grimmsnarl":"Angoliath", "Grookey":"Ouistempo", "Grotle":"Boskara", "Groudon":"Groudon",
-  "Grovyle":"Massko", "Growlithe":"Caninos", "Grubbin":"Larvibule", "Grumpig":"Groret",
-  "Gulpin":"Gloupti", "Gumshoos":"Argouste", "Gurdurr":"Ouvrifier", "Guzzlord":"Engloutyran",
-  "Gyarados":"Léviator", "Hakamo-o":"Écaïd", "Happiny":"Ptiravi", "Hariyama":"Hariyama",
-  "Hatenna":"Bibichut", "Hatterene":"Sorcilence", "Hattrem":"Chapotus", "Haunter":"Spectrum",
-  "Hawlucha":"Brutalibré", "Haxorus":"Tranchodon", "Heatmor":"Aflamanoir", "Heatran":"Heatran",
-  "Heliolisk":"Iguolta", "Helioptile":"Galvaran", "Heracross":"Scarhino", "Herdier":"Ponchien",
-  "Hippopotas":"Hippopotas", "Hippowdon":"Hippodocus", "Hitmonchan":"Tygnon", "Hitmonlee":"Kicklee",
-  "Hitmontop":"Kapoera", "Ho-Oh":"Ho-Oh", "Honchkrow":"Corboss", "Honedge":"Monorpale",
-  "Hoopa":"Hoopa", "Hoothoot":"Hoothoot", "Hoppip":"Granivol", "Horsea":"Hypotrempe",
-  "Houndoom":"Démolosse", "Houndour":"Malosse", "Houndstone":"Tomberro", "Huntail":"Serpang",
-  "Hydrapple":"Pomdorochi", "Hydreigon":"Trioxhydre", "Hypno":"Hypnomade", "Igglybuff":"Toudoudou",
-  "Illumise":"Lumivole", "Impidimp":"Grimalin", "Incineroar":"Félinferno", "Indeedee":"Wimessir",
-  "Infernape":"Simiabraz", "Inkay":"Sepiatop", "Inteleon":"Lézargus", "Iron Boulder":"Roc-de-Fer",
-  "Iron Bundle":"Hotte-de-Fer", "Iron Crown":"Chef-de-Fer", "Iron Hands":"Paume-de-Fer", "Iron Jugulis":"Têtes-de-Fer",
-  "Iron Leaves":"Vert-de-Fer", "Iron Moth":"Mite-de-Fer", "Iron Thorns":"Épine-de-Fer", "Iron Treads":"Roue-de-Fer",
-  "Iron Valiant":"Garde-de-Fer", "Ivysaur":"Herbizarre", "Jangmo-o":"Bébécaille", "Jellicent":"Moyade",
-  "Jigglypuff":"Rondoudou", "Jirachi":"Jirachi", "Jolteon":"Voltali", "Joltik":"Statitik",
-  "Jumpluff":"Cotovol", "Jynx":"Lippoutou", "Kabuto":"Kabuto", "Kabutops":"Kabutops",
-  "Kadabra":"Kadabra", "Kakuna":"Coconfort", "Kangaskhan":"Kangourex", "Karrablast":"Carabing",
-  "Kartana":"Katagami", "Kecleon":"Kecleon", "Keldeo":"Keldeo", "Kilowattrel":"Fulgulairo",
-  "Kingambit":"Scalpereur", "Kingdra":"Hyporoi", "Kingler":"Krabboss", "Kirlia":"Kirlia",
-  "Klang":"Clic", "Klawf":"Craparoi", "Kleavor":"Hachécateur", "Klefki":"Trousselin",
-  "Klink":"Tic", "Klinklang":"Cliticlic", "Koffing":"Smogo", "Komala":"Dodoala",
-  "Kommo-o":"Ékaïser", "Koraidon":"Koraidon", "Krabby":"Krabby", "Kricketot":"Crikzik",
-  "Kricketune":"Mélokrik", "Krokorok":"Escroco", "Krookodile":"Crocorible", "Kubfu":"Wushours",
-  "Kyogre":"Kyogre", "Kyurem":"Kyurem", "Lairon":"Galegon", "Lampent":"Mélancolux",
-  "Landorus":"Démétéros", "Lanturn":"Lanturn", "Lapras":"Lokhlass", "Larvesta":"Pyronille",
-  "Larvitar":"Embrylex", "Latias":"Latias", "Latios":"Latios", "Leafeon":"Phyllali",
-  "Leavanny":"Manternel", "Lechonk":"Gourmelet", "Ledian":"Coxyclaque", "Ledyba":"Coxy",
-  "Lickilicky":"Coudlangue", "Lickitung":"Excelangue", "Liepard":"Léopardus", "Lileep":"Lilia",
-  "Lilligant":"Fragilady", "Lillipup":"Ponchiot", "Linoone":"Linéon", "Litleo":"Hélionceau",
-  "Litten":"Flamiaou", "Litwick":"Funécire", "Lokix":"Gambex", "Lombre":"Lombre",
-  "Lopunny":"Lockpin", "Lotad":"Nénupiot", "Loudred":"Ramboum", "Lucario":"Lucario",
-  "Ludicolo":"Ludicolo", "Lugia":"Lugia", "Lumineon":"Luminéon", "Lunala":"Lunala",
-  "Lunatone":"Séléroc", "Lurantis":"Floramantis", "Luvdisc":"Lovdisc", "Luxio":"Luxio",
-  "Luxray":"Luxray", "Lycanroc":"Lougaroc", "Mabosstiff":"Dogrino", "Machamp":"Mackogneur",
-  "Machoke":"Machopeur", "Machop":"Machoc", "Magby":"Magby", "Magcargo":"Volcaropod",
-  "Magearna":"Magearna", "Magikarp":"Magicarpe", "Magmar":"Magmar", "Magmortar":"Maganon",
-  "Magnemite":"Magnéti", "Magneton":"Magnéton", "Magnezone":"Magnézone", "Makuhita":"Makuhita",
-  "Malamar":"Sepiatroce", "Mamoswine":"Mammochon", "Manaphy":"Manaphy", "Mandibuzz":"Vaututrice",
-  "Manectric":"Élecsprint", "Mankey":"Férosinge", "Mantine":"Démanta", "Mantyke":"Babimanta",
-  "Maractus":"Maracachi", "Mareanie":"Vorastérie", "Mareep":"Wattouat", "Marill":"Marill",
-  "Marowak":"Ossatueur", "Marshadow":"Marshadow", "Marshtomp":"Flobio", "Maschiff":"Grondogue",
-  "Masquerain":"Maskadra", "Maushold":"Famignol", "Mawile":"Mysdibule", "Medicham":"Charmina",
-  "Meditite":"Méditikka", "Meganium":"Méganium", "Melmetal":"Melmetal", "Meloetta":"Meloetta",
-  "Meltan":"Meltan", "Meowscarada":"Miascarade", "Meowstic":"Mistigrix", "Meowth":"Miaouss",
-  "Mesprit":"Créfollet", "Metagross":"Métalosse", "Metang":"Métang", "Metapod":"Chrysacier",
-  "Mew":"Mew", "Mewtwo":"Mewtwo", "Mienfoo":"Kungfouine", "Mienshao":"Shaofouine",
-  "Mightyena":"Grahyèna", "Milcery":"Crèmy", "Milotic":"Milobellus", "Miltank":"Écrémeuh",
-  "Mime Jr.":"Mime Jr.", "Mimikyu":"Mimiqui", "Minccino":"Chinchidou", "Minior":"Météno",
-  "Minun":"Négapi", "Miraidon":"Miraidon", "Misdreavus":"Feuforêve", "Mismagius":"Magirêve",
-  "Moltres":"Sulfura", "Monferno":"Chimpenfeu", "Morelull":"Spododo", "Morgrem":"Fourbelin",
-  "Morpeko":"Morpeko", "Mothim":"Papilord", "Mr. Mime":"M. Mime", "Mr. Rime":"M. Glaquette",
-  "Mudbray":"Tiboudet", "Mudkip":"Gobou", "Mudsdale":"Bourrinos", "Muk":"Grotadmorv",
-  "Munchlax":"Goinfrex", "Munkidori":"Fortusimia", "Munna":"Munna", "Murkrow":"Cornèbre",
-  "Musharna":"Mushana", "Nacli":"Selutin", "Naclstack":"Amassel", "Naganadel":"Mandrillon",
-  "Natu":"Natu", "Necrozma":"Necrozma", "Nickit":"Goupilou", "Nidoking":"Nidoking",
-  "Nidoqueen":"Nidoqueen", "Nidoran":"Nidoran", "Nidorina":"Nidorina", "Nidorino":"Nidorino",
-  "Nihilego":"Zéroïd", "Nincada":"Ningale", "Ninetales":"Feunard", "Ninjask":"Ninjask",
-  "Noctowl":"Noarfang", "Noibat":"Sonistrelle", "Noivern":"Bruyverne", "Nosepass":"Tarinor",
-  "Numel":"Chamallot", "Nuzleaf":"Pifeuil", "Nymble":"Lilliterelle", "Obstagoon":"Ixon",
-  "Octillery":"Octillery", "Oddish":"Mystherbe", "Ogerpon":"Ogerpon", "Oinkologne":"Fragroin",
-  "Okidogi":"Félicanis", "Omanyte":"Amonita", "Omastar":"Amonistar", "Onix":"Onix",
-  "Oranguru":"Gouroutan", "Orbeetle":"Astronelle", "Oricorio":"Plumeline", "Orthworm":"Ferdeter",
-  "Oshawott":"Moustillon", "Overqwil":"Qwilpik", "Pachirisu":"Pachirisu", "Palafin":"Superdofin",
-  "Palkia":"Palkia", "Palossand":"Trépassable", "Palpitoad":"Batracné", "Pancham":"Pandespiègle",
-  "Pangoro":"Pandarbare", "Panpour":"Flotajou", "Pansage":"Feuillajou", "Pansear":"Flamajou",
-  "Paras":"Paras", "Parasect":"Parasect", "Passimian":"Quartermac", "Patrat":"Ratentif",
-  "Pawmi":"Pohm", "Pawmo":"Pohmotte", "Pawmot":"Pohmarmotte", "Pawniard":"Scalpion",
-  "Pecharunt":"Pêchaminus", "Pelipper":"Bekipan", "Perrserker":"Berserkatt", "Persian":"Persian",
-  "Petilil":"Chlorobule", "Phanpy":"Phanpy", "Phantump":"Brocélôme", "Pheromosa":"Cancrelove",
-  "Phione":"Phione", "Pichu":"Pichu", "Pidgeot":"Roucarnage", "Pidgeotto":"Roucoups",
-  "Pidgey":"Roucool", "Pidove":"Poichigeon", "Pignite":"Grotichon", "Pikachu":"Pikachu",
-  "Pikipek":"Picassaut", "Piloswine":"Cochignon", "Pincurchin":"Wattapik", "Pineco":"Pomdepik",
-  "Pinsir":"Scarabrute", "Piplup":"Tiplouf", "Plusle":"Posipi", "Poipole":"Vémini",
-  "Politoed":"Tarpaud", "Poliwag":"Ptitard", "Poliwhirl":"Têtarte", "Poliwrath":"Tartard",
-  "Poltchageist":"Poltchageist", "Polteageist":"Polthégeist", "Pombon":"Caloulou", "Ponyta":"Ponyta",
-  "Poochyena":"Medhyèna", "Popplio":"Otaquin", "Porygon":"Porygon", "Porygon-Z":"Porygon-Z",
-  "Porygon2":"Porygon2", "Primarina":"Oratoria", "Primeape":"Colossinge", "Prinplup":"Prinplouf",
-  "Probopass":"Tarinorme", "Psyduck":"Psykokwak", "Pumpkaboo":"Pitrouille", "Pupitar":"Ymphect",
-  "Purrloin":"Chacripan", "Purugly":"Chaffreux", "Pyroar":"Némélios", "Pyukumuku":"Concombaffe",
-  "Quagsire":"Maraiste", "Quaquaval":"Palmaval", "Quaxly":"Coiffeton", "Quaxwell":"Canarbello",
-  "Quilava":"Feurisson", "Quilladin":"Boguérisse", "Qwilfish":"Qwilfish", "Raboot":"Lapyro",
-  "Rabsca":"Bérasca", "Raging Bolt":"Ire-Foudre", "Raichu":"Raichu", "Raikou":"Raikou",
-  "Ralts":"Tarsal", "Rampardos":"Charkos", "Rapidash":"Galopa", "Raticate":"Rattatac",
-  "Rattata":"Rattata", "Rayquaza":"Rayquaza", "Regice":"Regice", "Regidrago":"Regidrago",
-  "Regieleki":"Regieleki", "Regigigas":"Regigigas", "Regirock":"Regirock", "Registeel":"Registeel",
-  "Relicanth":"Relicanth", "Rellor":"Léboulérou", "Remoraid":"Rémoraid", "Reshiram":"Reshiram",
-  "Reuniclus":"Symbios", "Revavroom":"Vrombotor", "Rhydon":"Rhinoféros", "Rhyhorn":"Rhinocorne",
-  "Rhyperior":"Rhinastoc", "Ribombee":"Rubombelle", "Rillaboom":"Gorythmic", "Riolu":"Riolu",
-  "Roaring Moon":"Rugit-Lune", "Rockruff":"Rocabot", "Roggenrola":"Nodulithe", "Rolycoly":"Charbi",
-  "Rookidee":"Minisange", "Roselia":"Rosélia", "Roserade":"Roserade", "Rotom":"Motisma",
-  "Rowlet":"Brindibou", "Rufflet":"Furaiglon", "Runerigus":"Tutétékri", "Sableye":"Ténéfix",
-  "Salamence":"Drattak", "Salandit":"Tritox", "Salazzle":"Malamandre", "Samurott":"Clamiral",
-  "Sandaconda":"Dunaconda", "Sandile":"Mascaïman", "Sandshrew":"Sabelette", "Sandslash":"Sablaireau",
-  "Sandy Shocks":"Pelage-Sablé", "Sandygast":"Bacabouh", "Sawk":"Karaclée", "Sawsbuck":"Haydaim",
-  "Scatterbug":"Lépidonille", "Sceptile":"Jungko", "Scizor":"Cizayox", "Scolipede":"Brutapode",
-  "Scorbunny":"Flambino", "Scovillain":"Scovilain", "Scrafty":"Baggaïd", "Scraggy":"Baggiguane",
-  "Scream Tail":"Hurle-Queue", "Scyther":"Insécateur", "Seadra":"Hypocéan", "Seaking":"Poissoroy",
-  "Sealeo":"Phogleur", "Seedot":"Grainipiot", "Seel":"Otaria", "Seismitoad":"Crapustule",
-  "Sentret":"Fouinette", "Serperior":"Majaspic", "Servine":"Lianaja", "Seviper":"Séviper",
-  "Sewaddle":"Larveyette", "Sharpedo":"Sharpedo", "Shaymin":"Shaymin", "Shedinja":"Munja",
-  "Shelgon":"Drackhaus", "Shellder":"Kokiyas", "Shellos":"Sancoki", "Shelmet":"Escargaume",
-  "Shieldon":"Dinoclier", "Shiftry":"Tengalice", "Shiinotic":"Lampignon", "Shinx":"Lixy",
-  "Shroodle":"Gribouraigne", "Shroomish":"Balignon", "Shuckle":"Caratroc", "Shuppet":"Polichombr",
-  "Sigilyph":"Cryptéro", "Silcoon":"Armulys", "Silicobra":"Dunaja", "Silvally":"Silvallié",
-  "Simipour":"Flotoutan", "Simisage":"Feuiloutan", "Simisear":"Flamoutan", "Sinistcha":"Théffroyable",
-  "Sinistea":"Théffroi", "Sirfetch'd":"Palarticho", "Sizzlipede":"Grillepattes", "Skarmory":"Airmure",
-  "Skeledirge":"Flâmigator", "Skiddo":"Cabriolaine", "Skiploom":"Floravol", "Skitty":"Skitty",
-  "Skorupi":"Rapion", "Skrelp":"Venalgue", "Skuntank":"Moufflair", "Skwovet":"Rongourmand",
-  "Slaking":"Monaflèmit", "Slakoth":"Parecool", "Sliggoo":"Colimucus", "Slither Wing":"Rampe-Ailes",
-  "Slowbro":"Flagadoss", "Slowking":"Roigada", "Slowpoke":"Ramoloss", "Slugma":"Limagma",
-  "Slurpuff":"Cupcanaille", "Smeargle":"Queulorior", "Smoliv":"Olivini", "Smoochum":"Lippouti",
-  "Sneasel":"Farfuret", "Sneasler":"Farfurex", "Snivy":"Vipélierre", "Snom":"Frissonille",
-  "Snorlax":"Ronflex", "Snorunt":"Stalgamin", "Snover":"Blizzi", "Snubbull":"Snubbull",
-  "Sobble":"Larméléon", "Solgaleo":"Solgaleo", "Solosis":"Nucléos", "Solrock":"Solaroc",
-  "Spearow":"Piafabec", "Spectrier":"Spectreval", "Spewpa":"Pérégrain", "Spheal":"Obalie",
-  "Spidops":"Filentrappe", "Spinarak":"Mimigal", "Spinda":"Spinda", "Spiritomb":"Spiritomb",
-  "Spoink":"Spoink", "Sprigatito":"Poussacha", "Spritzee":"Fluvetin", "Squawkabilly":"Tapatoès",
-  "Squirtle":"Carapuce", "Stakataka":"Ama-Ama", "Stantler":"Cerfrousse", "Staraptor":"Étouraptor",
-  "Staravia":"Étourvol", "Starly":"Étourmi", "Starmie":"Staross", "Staryu":"Stari",
-  "Steelix":"Steelix", "Steenee":"Candine", "Stonjourner":"Dolman", "Stoutland":"Mastouffe",
-  "Stufful":"Nounourson", "Stunfisk":"Limonde", "Stunky":"Moufouette", "Sudowoodo":"Simularbre",
-  "Suicune":"Suicune", "Sunflora":"Héliatronc", "Sunkern":"Tournegrin", "Surskit":"Arakdo",
-  "Swablu":"Tylton", "Swadloon":"Couverdure", "Swalot":"Avaltout", "Swampert":"Laggron",
-  "Swanna":"Lakmécygne", "Swellow":"Hélédelle", "Swinub":"Marcacrin", "Swirlix":"Sucroquin",
-  "Swoobat":"Rhinolove", "Sylveon":"Nymphali", "Tadbulb":"Têtampoule", "Taillow":"Nirondelle",
-  "Talonflame":"Flambusard", "Tandemaus":"Compagnol", "Tangela":"Saquedeneu", "Tangrowth":"Bouldeneu",
-  "Tapu Bulu":"Tokotoro", "Tapu Fini":"Tokopisco", "Tapu Koko":"Tokorico", "Tapu Lele":"Tokopiyon",
-  "Tarountula":"Tissenboule", "Tatsugiri":"Nigirigon", "Tauros":"Tauros", "Teddiursa":"Teddiursa",
-  "Tentacool":"Tentacool", "Tentacruel":"Tentacruel", "Tepig":"Gruikui", "Terapagos":"Terapagos",
-  "Terrakion":"Terrakium", "Thievul":"Roublenard", "Throh":"Judokrak", "Thundurus":"Fulguris",
-  "Thwackey":"Badabouin", "Timburr":"Charpenti", "Ting-Lu":"Dinglu", "Tinkatink":"Forgerette",
-  "Tinkaton":"Forgelina", "Tinkatuff":"Forgella", "Tirtouga":"Carapagos", "Toedscool":"Terracool",
-  "Toedscruel":"Terracruel", "Togedemaru":"Togedemaru", "Togekiss":"Togekiss", "Togepi":"Togepi",
-  "Togetic":"Togetic", "Torchic":"Poussifeu", "Torkoal":"Chartor", "Tornadus":"Boréas",
-  "Torracat":"Matoufeu", "Torterra":"Torterra", "Totodile":"Kaiminus", "Toucannon":"Bazoucan",
-  "Toxapex":"Prédastérie", "Toxel":"Toxizap", "Toxicroak":"Coatox", "Toxtricity":"Salarsen",
-  "Tranquill":"Colombeau", "Trapinch":"Kraknoix", "Treecko":"Arcko", "Trevenant":"Desséliande",
-  "Tropius":"Tropius", "Trubbish":"Miamiasme", "Trumbeak":"Piclairon", "Tsareena":"Sucreine",
-  "Turtonator":"Boumata", "Turtwig":"Tortipouss", "Tympole":"Tritonde", "Tynamo":"Anchwatt",
-  "Type: Null":"Type:0", "Typhlosion":"Typhlosion", "Tyranitar":"Tyranocif", "Tyrantrum":"Rexillius",
-  "Tyrogue":"Debugant", "Tyrunt":"Ptyranidur", "Umbreon":"Noctali", "Unfezant":"Déflaisan",
-  "Unown":"Zarbi", "Ursaluna":"Ursaking", "Ursaring":"Ursaring", "Urshifu":"Shifours",
-  "Uxie":"Créhelf", "Vanillish":"Sorboul", "Vanillite":"Sorbébé", "Vanilluxe":"Sorbouboul",
-  "Vaporeon":"Aquali", "Varoom":"Vrombi", "Veluza":"Délestin", "Venipede":"Venipatte",
-  "Venomoth":"Aéromite", "Venonat":"Mimitoss", "Venusaur":"Florizarre", "Vespiquen":"Apireine",
-  "Vibrava":"Vibraninf", "Victini":"Victini", "Victreebel":"Empiflor", "Vigoroth":"Vigoroth",
-  "Vikavolt":"Lucanon", "Vileplume":"Rafflesia", "Virizion":"Viridium", "Vivillon":"Prismillon",
-  "Volbeat":"Muciole", "Volcanion":"Volcanion", "Volcarona":"Pyrax", "Voltorb":"Voltorbe",
-  "Vullaby":"Vostourno", "Vulpix":"Goupix", "Wailmer":"Wailmer", "Wailord":"Wailord",
-  "Walking Wake":"Serpente-Eau", "Walrein":"Kaimorse", "Wartortle":"Carabaffe", "Watchog":"Miradar",
-  "Wattrel":"Zapétrel", "Weavile":"Dimoret", "Weedle":"Aspicot", "Weepinbell":"Boustiflor",
-  "Weezing":"Smogogo", "Whimsicott":"Farfaduvet", "Whirlipede":"Scobolide", "Whiscash":"Barbicha",
-  "Whismur":"Chuchmur", "Wigglytuff":"Grodoudou", "Wiglett":"Taupikeau", "Wimpod":"Sovkipou",
-  "Wingull":"Goélise", "Wishiwashi":"Froussardine", "Wo-Chien":"Chongjian", "Wobbuffet":"Qulbutoké",
-  "Woobat":"Chovsourir", "Wooloo":"Moumouton", "Wooper":"Axoloto", "Wormadam":"Cheniselle",
-  "Wugtrio":"Triopikeau", "Wurmple":"Chenipotte", "Wynaut":"Okéoké", "Wyrdeer":"Cerbyllin",
-  "Xatu":"Xatu", "Xerneas":"Xerneas", "Xurkitree":"Câblifère", "Yamask":"Tutafeh",
-  "Yamper":"Voltoutou", "Yanma":"Yanma", "Yanmega":"Yanméga", "Yungoos":"Manglouton",
-  "Yveltal":"Yveltal", "Zacian":"Zacian", "Zamazenta":"Zamazenta", "Zangoose":"Mangriff",
-  "Zapdos":"Électhor", "Zarude":"Zarude", "Zebstrika":"Zéblitz", "Zekrom":"Zekrom",
-  "Zeraora":"Zeraora", "Zigzagoon":"Zigzaton", "Zoroark":"Zoroark", "Zorua":"Zorua",
-  "Zubat":"Nosferapti", "Zweilous":"Diamat", "Zygarde":"Zygarde"
-};
-const EN_POKE = FR_DISPLAY;
-const EN_SETS = {};
-for (const fr in FR_SETS) EN_SETS[FR_SETS[fr]] = prettify(fr);
-const EN_POKE_KEYS = Object.keys(EN_POKE).sort((a, b) => b.length - a.length);
-function frName(n) {
-  if (!n) return n;
-  if (EN_POKE[n]) return EN_POKE[n];
-  for (const k of EN_POKE_KEYS) {
-    if (n.startsWith(k + " ")) return EN_POKE[k] + n.slice(k.length);
-  }
-  return n;
-}
-function frSet(s) { return (s && EN_SETS[s]) || s; }
-function cmUrl(c) {
-  return "https://www.cardmarket.com/fr/Pokemon/Products/Singles?searchQuery=" + encodeURIComponent(c.name);
-}
-
-
-// ---------- État ----------
-let apiKey = "";
-try { apiKey = localStorage.getItem(KEY_STORE) || ""; } catch (e) {}
-let cards = [];
-try { cards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { cards = []; }
-function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cards)); } catch (e) {} }
-const ui = {
-  tab: "list", needKey: !apiKey, keyInput: "",
-  search: "", results: [], searching: false, error: null, note: null,
-  pending: null, photo: null,
-  sortBy: "added", sortDesc: false, filterText: "", filterSet: "all", hideUnpriced: false,
-  refreshing: false, refreshMsg: null, busyKeys: new Set(),
-  quota: null, busyKey: false,
-};
-
-// ---------- Utilitaires ----------
-const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-const fmtPrice = (v) => (v == null ? "—" : v.toFixed(2) + " $");
-const fmtDate = (iso) => iso ? new Date(iso).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : "—";
-const key = (c) => c.id + "|" + c.variant + "|" + c.condition;
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const COND_LABELS = { MINT: "Mint", NEAR_MINT: "Near Mint", EXCELLENT: "Excellente", GOOD: "Bonne", LIGHTLY_PLAYED: "Peu jouée", MODERATELY_PLAYED: "Jouée", HEAVILY_PLAYED: "Très jouée", DAMAGED: "Abîmée" };
-const condLabel = (c) => COND_LABELS[c] || c;
-const VAR_LABELS = { Normal: "Normale", Holofoil: "Holo", Reverse_Holofoil: "Reverse Holo", "1st_Edition": "1ère édition", "1st_Edition_Holofoil": "1ère éd. Holo", Unlimited: "Illimitée" };
-const varLabel = (v) => VAR_LABELS[v] || v;
-
-function compressImage(file, maxSize, cb) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    const img = new Image();
-    img.onload = () => {
-      const sc = Math.min(1, maxSize / Math.max(img.width, img.height));
-      const c = document.createElement("canvas");
-      c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
-      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      cb(c.toDataURL("image/jpeg", 0.75));
-    };
-    img.src = reader.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-// ---------- Connexion Pokétrace (throttle 1 req / 2,2 s) ----------
-let lastReqTime = 0;
-async function ptFetch(path) {
-  const wait = 2200 - (Date.now() - lastReqTime);
-  if (wait > 0) await sleep(wait);
-  lastReqTime = Date.now();
-  let res;
+async function searchCards(name) {
+  status("searchStatus", "Recherche en cours…");
+  $("results").innerHTML = "";
   try {
-    res = await fetch(PT + path, { headers: { "X-API-Key": apiKey } });
+    const list = await jfetch(TCGDEX + "/cards?name=" + encodeURIComponent(name));
+    ui.results = (Array.isArray(list) ? list : []).slice(0, 24);
+    status("searchStatus", ui.results.length + " carte(s) trouvée(s) — clique pour ajouter.", "ok");
   } catch (e) {
-    throw new Error("Connexion à Pokétrace impossible. Vérifiez votre connexion internet.");
+    ui.results = []; status("searchStatus", "Connexion à TCGdex impossible (" + e.message + ")", "err");
   }
-  if (res.status === 401 || res.status === 403) {
-    ui.needKey = true;
-    throw new Error("Clé API refusée par Pokétrace (code " + res.status + "). Vérifiez votre clé sur poketrace.com/dashboard.");
-  }
-  if (res.status === 429) throw new Error("Limite de requêtes atteinte (Pokétrace). Attendez quelques secondes ou réessayez demain.");
-  if (!res.ok) throw new Error("Erreur Pokétrace (code " + res.status + ").");
-  return res.json();
-}
-async function loadQuota() {
-  try {
-    const j = await ptFetch("/auth/info");
-    if (j && j.data && j.data.user) ui.quota = j.data.user;
-    render();
-  } catch (e) { ui.error = e.message; render(); }
+  renderResults();
 }
 
-// ---------- Prix ----------
-function priceFromCard(cardData, condition) {
-  if (!cardData || !cardData.prices) return { market: null, source: null };
-  const cond = condition || (cardData.conditionOptions && cardData.conditionOptions[0]) || "NEAR_MINT";
-  const srcs = ["tcgplayer", "ebay"];
-  for (const s of srcs) {
-    const t = cardData.prices[s];
-    if (!t) continue;
-    const p = t[cond];
-    if (p && typeof p.avg === "number") return { market: p.avg, source: s === "tcgplayer" ? "TCGPlayer (" + condLabel(cond) + ")" : "eBay (" + condLabel(cond) + ")" };
-  }
-  // repli : n'importe quelle condition dispo
-  for (const s of srcs) {
-    const t = cardData.prices[s];
-    if (!t) continue;
-    const kk = Object.keys(t)[0];
-    if (t[kk] && typeof t[kk].avg === "number") return { market: t[kk].avg, source: s === "tcgplayer" ? "TCGPlayer (" + condLabel(kk) + ")" : "eBay (" + condLabel(kk) + ")" };
-  }
-  return { market: null, source: null };
+async function getDetail(id) {
+  if (detailCache.has(id)) return detailCache.get(id);
+  const d = await jfetch(TCGDEX + "/cards/" + encodeURIComponent(id));
+  detailCache.set(id, d); return d;
 }
-function variantsOf(cardData) {
-  const out = [];
-  const prices = (cardData && cardData.prices) || {};
-  for (const s of ["tcgplayer", "ebay"]) {
-    const t = prices[s];
-    if (!t) continue;
-    for (const cond of Object.keys(t)) if (out.indexOf(cond) === -1) out.push(cond);
+
+// Cote EUR via Pokemon TCG API (CardMarket prices), fallback TCGdex pricing
+async function getPrice(tcgdexId, finish) {
+  // 1) essais Pokemon TCG API : id tel quel, puis sans suffixe lettre
+  let ptcgId = tcgdexId, data = null;
+  for (const attempt of [tcgdexId, tcgdexId.replace(/[a-z]$/, "")]) {
+    if (!attempt) continue;
+    try { const res = await jfetch(PTCG + "/" + encodeURIComponent(attempt)); data = res && res.data; ptcgId = attempt; if (data && data.cardmarket) break; } catch (e) {}
   }
+  const pr = data && data.cardmarket && data.cardmarket.prices ? data.cardmarket.prices : null;
+  if (pr) {
+    if (finish === "Reverse Holo" && pr.reverseHoloTrend != null) return { price: pr.reverseHoloTrend, source: "CardMarket (via Pokémon TCG API)" };
+    if (finish === "Holo" && pr.holoTrend != null) return { price: pr.holoTrend, source: "CardMarket (via Pokémon TCG API)" };
+    if (finish !== "Reverse Holo" && pr.trendPrice != null) return { price: pr.trendPrice, source: "CardMarket (via Pokémon TCG API)" };
+  }
+  // 2) fallback : pricing TCGdex (aussi CardMarket EUR)
+  try {
+    const d = await getDetail(tcgdexId);
+    const cm = d && d.pricing && d.pricing.cardmarket;
+    if (cm) {
+      const v = (finish === "Normale") ? cm.trend : (cm["trend-holo"] != null ? cm["trend-holo"] : cm.trend);
+      if (v != null) return { price: v, source: "CardMarket (via TCGdex)" };
+    }
+  } catch (e) {}
+  return { price: null, source: "Non cotée" };
+}
+
+// ---------- Rendu résultats ----------
+function renderResults() {
+  const g = $("results");
+  if (!ui.results.length) { g.innerHTML = ""; return; }
+  g.innerHTML = ui.results.map((c, i) =>
+    '<div class="rescard" data-i="' + i + '"><img loading="lazy" src="' + esc(imgUrl(c.image)) + '" alt="">' +
+    '<div class="n">' + esc(c.name) + '</div><div class="s">#' + esc(c.localId) + "</div></div>"
+  ).join("");
+  g.querySelectorAll(".rescard").forEach(el => el.onclick = () => openModal(ui.results[+el.dataset.i]));
+}
+
+// ---------- Modale ajout ----------
+function finishesFor(detail) {
+  const v = (detail && detail.variants) || {};
+  const out = ["Normale"];
+  if (v.reverse !== false) out.push("Reverse Holo");
+  if (v.holo !== false) out.push("Holo");
   return out;
 }
 
-// ---------- Recherche ----------
-async function runSearch(ev) {
-  if (ev) ev.preventDefault();
-  const q = document.getElementById("searchInput").value.trim();
-  if (!q) return;
-  ui.search = q; ui.searching = true; ui.error = null; ui.note = null; ui.results = [];
-  render();
-  try {
-    const fr = translateQuery(q);
-    const en = fr && fr !== q ? fr : q;
-    if (fr && fr.toLowerCase() !== q.toLowerCase()) ui.note = "Recherche traduite : « " + en + " » (depuis « " + q + " »)";
-    const j = await ptFetch("/cards?search=" + encodeURIComponent(en) + "&market=US&limit=24&product_type=single");
-    ui.results = (j && j.data) || [];
-    if (ui.results.length === 0) {
-      const sg = suggestFr(q);
-      ui.error = "Aucune carte trouvée pour « " + q + " »." + (sg.length ? " Vouliez-vous dire : " + sg.join(", ") + " ?" : "");
-    }
-  } catch (e) { ui.error = e.message || "Erreur réseau"; }
-  ui.searching = false; render();
-}
-function pickResult(id) {
-  const r = ui.results.find((x) => x.id === id);
-  if (!r) return;
-  const conds = (r.conditionOptions && r.conditionOptions.length) ? r.conditionOptions : variantsOf(r);
-  const cond = conds.indexOf("NEAR_MINT") >= 0 ? "NEAR_MINT" : (conds[0] || "NEAR_MINT");
-  const p = priceFromCard(r, cond);
-  ui.pending = {
-    id: r.id, name: r.name, set: (r.set && r.set.name) || "?",
-    number: r.cardNumber || "", variant: r.variant || "Normal", rarity: r.rarity || "",
-    image: r.image || null, conditions: conds, condition: cond,
-    photo: ui.photo, qty: 1,
-    price: p.market, priceDate: p.market != null ? new Date().toISOString() : null, priceSource: p.source,
+async function openModal(min) {
+  const bg = $("modalBg"), box = $("modalBox");
+  bg.classList.add("on");
+  bg.onclick = e => { if (e.target === bg) bg.classList.remove("on"); };
+  box.innerHTML = '<div class="empty">Chargement…</div>';
+  let d;
+  try { d = await getDetail(min.id); }
+  catch (e) { box.innerHTML = '<div class="empty">Impossible de charger la carte.<br>' + esc(e.message) + '</div>'; return; }
+  const fin = finishesFor(d);
+  box.innerHTML =
+    '<h3>' + esc(d.name) + '</h3>' +
+    '<div class="mgrid"><img src="' + esc(imgUrl(d.image)) + '" alt="">' +
+    '<div class="mfields">' +
+      '<div><label>Édition</label><div>' + esc(d.set && d.set.name || "—") + ' · ' + esc(d.rarity || "") + '</div></div>' +
+      '<div><label>Numéro</label><div>#' + esc(d.localId) + ' / ' + esc(d.set && d.set.cardCount && d.set.cardCount.official || "?") + '</div></div>' +
+      '<div><label>Finition</label><select id="mFin">' + fin.map(f => '<option>' + f + '</option>').join("") + '</select></div>' +
+      '<div><label>Quantité</label><input id="mQty" type="number" min="1" value="1"></div>' +
+      '<button class="btn-acc" id="mAdd">Ajouter + récupérer la cote</button>' +
+      '<div class="status" id="mStatus"></div>' +
+    '</div></div>';
+  $("mAdd").onclick = async () => {
+    const btn = $("mAdd"); btn.disabled = true; btn.textContent = "Récupération de la cote…";
+    const finish = $("mFin").value, qty = Math.max(1, parseInt($("mQty").value) || 1);
+    const { price, source } = await getPrice(min.id, finish);
+    ui.coll.push({
+      id: min.id, name: d.name, setName: d.set && d.set.name || "",
+      rarity: d.rarity || "", number: d.localId, image: d.image,
+      finish, qty, price, priceDate: price != null ? new Date().toISOString() : null,
+      source, added: Date.now(), photo: null
+    });
+    save(); render();
+    bg.classList.remove("on");
+    toast(price != null ? ("Ajouté : " + eur(price)) : "Ajouté (cote indisponible)", price == null);
   };
-  render();
-}
-function changePendingCondition(cond) {
-  const r = ui.results.find((x) => x.id === ui.pending.id);
-  const p = priceFromCard(r, cond);
-  ui.pending.condition = cond;
-  ui.pending.price = p.market;
-  ui.pending.priceDate = p.market != null ? new Date().toISOString() : null;
-  ui.pending.priceSource = p.source;
-  render();
-}
-function cancelPending() { ui.pending = null; render(); }
-function clearPhoto() { ui.photo = null; render(); }
-function switchTab(t) { ui.tab = t; render(); }
-function confirmAdd() {
-  if (!ui.pending) return;
-  ui.pending.qty = Math.max(1, parseInt(document.getElementById("pQty").value, 10) || 1);
-  const i = cards.findIndex((c) => c.id === ui.pending.id && c.variant === ui.pending.variant && c.condition === ui.pending.condition);
-  if (i >= 0) cards[i].qty += ui.pending.qty;
-  else cards.push(ui.pending);
-  save();
-  ui.pending = null; ui.photo = null; ui.results = []; ui.tab = "list";
-  render();
-}
-function removeCard(k) { cards = cards.filter((c) => key(c) !== k); save(); render(); }
-
-// ---------- Cotes ----------
-async function refreshCard(c, silent) {
-  const k = key(c);
-  if (!silent) { ui.busyKeys.add(k); render(); }
-  try {
-    const j = await ptFetch("/cards/" + encodeURIComponent(c.id));
-    const fresh = j && j.data;
-    const i = cards.findIndex((x) => key(x) === k);
-    if (fresh && i >= 0) {
-      const p = priceFromCard(fresh, c.condition);
-      cards[i].price = p.market;
-      cards[i].priceDate = p.market != null ? new Date().toISOString() : null;
-      cards[i].priceSource = p.source;
-      save();
-    }
-  } catch (e) { if (!silent) { ui.error = e.message; } }
-  ui.busyKeys.delete(k); render();
-}
-async function refreshCardByKey(k) { const c = cards.find((x) => key(x) === k); if (c) refreshCard(c); }
-async function refreshAll() {
-  if (!cards.length || ui.refreshing) return;
-  ui.refreshing = true; ui.refreshMsg = "Actualisation des cotes… 0/" + cards.length; render();
-  let done = 0;
-  for (const c of cards) {
-    await refreshCard(c, true);
-    done++;
-    ui.refreshMsg = "Actualisation des cotes… " + done + "/" + cards.length;
-    render();
-  }
-  ui.refreshing = false;
-  ui.refreshMsg = "Cotes actualisées : " + done + " carte(s).";
-  render();
-  loadQuota();
 }
 
-// ---------- Lien Cardmarket exact + cote FR ----------
-function promptCmLink(k) {
-  const c = cards.find((x) => key(x) === k);
-  if (!c) return;
-  const v = (window.prompt("Colle ici le lien Cardmarket exact de la carte :", c.cmExact || "") || "").trim();
-  if (!v) return;
-  if (!/^https?:\/\/(www\.)?cardmarket\.com\//i.test(v)) { window.alert("Lien invalide : il doit pointer vers cardmarket.com."); return; }
-  c.cmExact = v; save(); render();
-}
-function promptFRPrice(k) {
-  const c = cards.find((x) => key(x) === k);
-  if (!c) return;
-  const v = (window.prompt("Colle la cote Cardmarket en euros (ex : 12,50 €) :", c.priceFR != null ? String(c.priceFR).replace(".", ",") : "") || "").trim();
-  if (!v) return;
-  const num = parseFloat(v.replace(/[^\d.,]/g, "").replace(",", "."));
-  if (!isFinite(num) || num <= 0) { window.alert("Valeur illisible. Exemple : 12,50"); return; }
-  c.priceFR = num; c.priceFRDate = new Date().toISOString(); c.priceFRSource = "Cardmarket (saisie)";
-  save(); render();
+// ---------- Collection ----------
+function visible() {
+  const { q, finish, sort } = ui.filters;
+  const ql = q.trim().toLowerCase();
+  let list = ui.coll.filter(c =>
+    (!ql || (c.name + " " + c.setName).toLowerCase().includes(ql)) &&
+    (!finish || c.finish === finish)
+  );
+  const cmp = {
+    name: (a,b) => a.name.localeCompare(b.name, "fr") || a.number.localeCompare(b.number, "fr", {numeric:true}),
+    set:  (a,b) => (a.setName||"").localeCompare(b.setName||"", "fr") || a.name.localeCompare(b.name, "fr"),
+    price:(a,b) => (b.price||0)-(a.price||0),
+    added:(a,b) => b.added-a.added
+  }[sort];
+  return list.sort(cmp);
 }
 
-// ---------- Export CSV ----------
-function exportCSV() {
-  const headers = ["Nom (FR)","Nom (EN)","Édition (FR)","Édition (EN)","Numéro","Variante","Rareté","État","Quantité","Cote US ($)","Cote × Qté ($)","Source US","Maj US","Lien Cardmarket","Cote FR (€)","Cote FR × Qté (€)","Maj FR","ID Pokétrace","Photo perso"];
-  const e = (v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
-  const total = cards.reduce((s, c) => s + (c.price || 0) * c.qty, 0);
-  const totalFR = cards.reduce((s, c) => s + (c.priceFR || 0) * c.qty, 0);
-  const totalCards = cards.reduce((s, c) => s + c.qty, 0);
-  const rows = cards.map((c) => [
-    e(frName(c.name)), e(c.name), e(frSet(c.set)), e(c.set), e(c.number), e(varLabel(c.variant)), e(c.rarity), e(condLabel(c.condition)), c.qty,
-    c.price != null ? c.price.toFixed(2) : "", c.price != null ? (c.price * c.qty).toFixed(2) : "",
-    e(c.priceSource), e(c.priceDate), e(c.cmExact || ""),
-    c.priceFR != null ? c.priceFR.toFixed(2) : "", c.priceFR != null ? (c.priceFR * c.qty).toFixed(2) : "",
-    e(c.priceFRDate), e(c.id), c.photo ? "oui" : "non",
-  ].join(";"));
-  const csv = "\uFEFF" + headers.join(";") + "\n" + rows.join("\n") + "\n" + ["TOTAL","","","","","","","",totalCards,"",total.toFixed(2),"","","",totalFR.toFixed(2),"","","",""].join(";");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "collection-pokemon-" + new Date().toISOString().slice(0, 10) + ".csv";
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
-
-// ---------- Affichage ----------
 function render() {
-  const total = cards.reduce((s, c) => s + (c.price || 0) * c.qty, 0);
-  const totalFR = cards.reduce((s, c) => s + (c.priceFR || 0) * c.qty, 0);
-  const totalCards = cards.reduce((s, c) => s + c.qty, 0);
-  const pricedCount = cards.filter((c) => c.price != null).length;
-  const pricedFRCount = cards.filter((c) => c.priceFR != null).length;
-  document.getElementById("subTitle").textContent =
-    totalCards + " carte" + (totalCards > 1 ? "s" : "") + " · Valeur US : " + fmtPrice(total) +
-    (pricedFRCount > 0 ? " · Valeur FR : " + totalFR.toFixed(2) + " €" : "") +
-    (ui.quota ? " · ⚡ " + ui.quota.remaining + "/" + ui.quota.limit + " requêtes aujourd'hui" : "");
-  document.getElementById("hbtns").innerHTML =
-    (ui.tab === "list"
-      ? '<button class="btn ghost" onclick="refreshAll()" ' + (ui.refreshing || !cards.length ? "disabled" : "") + '>' + (ui.refreshing ? "Actualisation…" : "🔄 Rafraîchir les cotes") + '</button>' +
-        '<button class="btn ghost" onclick="exportCSV()" ' + (!cards.length ? "disabled" : "") + '>⬇️ Export CSV</button>' +
-        '<button class="btn light" onclick="switchTab(\'add\')">+ Ajouter une carte</button>'
-      : '<button class="btn light" onclick="switchTab(\'list\')">← Retour à la liste</button>');
-  const main = document.getElementById("main");
-  if (ui.needKey) { main.innerHTML = keyHtml(); return; }
-  if (ui.tab === "add") {
-    main.innerHTML =
-      '<section class="card"><h2>📸 Photo de la carte (optionnel)</h2>' +
-      '<p class="muted">La photo est jointe à la fiche pour mémoire. La carte est identifiée par la recherche ci-dessous.</p>' +
-      '<input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none">' +
-      '<div class="row">' +
-      '<button class="btn primary" onclick="document.getElementById(\'photoInput\').click()">' + (ui.photo ? "Changer la photo" : "Prendre / choisir une photo") + '</button>' +
-      (ui.photo ? '<img src="' + ui.photo + '" style="width:52px;height:72px;object-fit:cover;border-radius:6px">' +
-        '<button class="btn line" onclick="clearPhoto()">Retirer</button>' : "") +
-      '</div></section>' +
-      '<section class="card"><h2>🔎 Rechercher une carte</h2>' +
-      '<p class="muted">Noms français reconnus (dictionnaire : ' + Object.keys(FR_POKE).length + ' noms). Exemples : <code>exagide</code>, <code>dracaufeu</code>, <code>ptera</code>. Les résultats affichent les différentes finitions.</p>' +
-      '<form class="row" onsubmit="runSearch(event)">' +
-      '<input type="text" id="searchInput" style="flex:1;min-width:180px" placeholder="Nom de la carte…" value="' + esc(ui.search) + '">' +
-      '<button class="btn primary" type="submit" ' + (ui.searching ? "disabled" : "") + '>' + (ui.searching ? "…" : "Rechercher") + '</button></form>' +
-      (ui.searching ? '<p class="muted" style="margin-top:10px"><span class="spin"></span>Recherche en cours…</p>' : "") +
-      (ui.note ? '<div class="note">🇫🇷→🇬🇧 ' + esc(ui.note) + '</div>' : "") +
-      (ui.error ? '<p class="err">' + esc(ui.error) + '</p>' : "") +
-      '<div class="grid">' + ui.results.map((r) =>
-        '<button class="rbtn" onclick="pickResult(\'' + esc(r.id) + '\')">' +
-        (r.image ? '<img src="' + esc(r.image) + '" alt="">' : '') +
-        '<div class="cap"><b>' + esc(frName(r.name)) + '</b>' +
-        (r.variant && r.variant !== "Normal" ? ' <span class="badge holo">' + esc(varLabel(r.variant)) + '</span>' : "") +
-        '<br><span style="color:#64748b">' + esc(frSet((r.set && r.set.name) || "")) + ' · #' + esc(r.cardNumber) + '</span>' +
-        '<br><span style="color:#059669;font-weight:600">' + fmtPrice(priceFromCard(r, null).market) + '</span></div></button>'
-      ).join("") + '</div></section>' +
-      (ui.pending ? confirmHtml() : "");
-    const pi = document.getElementById("photoInput");
-    if (pi) pi.onchange = (ev) => {
-      const f = ev.target.files && ev.target.files[0];
-      if (f) compressImage(f, 400, (d) => { ui.photo = d; render(); });
-      ev.target.value = "";
+  const list = visible(), tb = $("tbody");
+  $("collEmpty").style.display = ui.coll.length ? "none" : "block";
+  const cards = ui.coll.reduce((s,c) => s + c.qty, 0);
+  const val = ui.coll.reduce((s,c) => s + (c.price||0) * c.qty, 0);
+  const sets = new Set(ui.coll.map(c => c.setName)).size;
+  $("stats").innerHTML = "<span>CARTES : <b>" + cards + "</b></span><span>RÉFÉRENCES : <b>" + ui.coll.length + "</b></span><span>ÉDITIONS : <b>" + sets + "</b></span><span>VALEUR : <b>" + eur(val) + "</b></span>";
+  tb.innerHTML = list.map((c) => {
+    const idx = ui.coll.indexOf(c);
+    const cls = c.finish === "Reverse Holo" ? "rh" : (c.finish === "Holo" ? "holo" : "");
+    return '<tr>' +
+      '<td>' + (c.photo ? '<img class="ph" src="' + c.photo + '">' : '<button class="btn-sec btn-mini" data-act="photo" data-i="' + idx + '">📷</button>') + '</td>' +
+      '<td><div style="display:flex;gap:8px;align-items:center"><img class="thumb" loading="lazy" src="' + esc(imgUrl(c.image)) + '"><b>' + esc(c.name) + '</b></div></td>' +
+      '<td>' + esc(c.setName) + '</td><td>#' + esc(c.number) + '</td>' +
+      '<td><span class="badge ' + cls + '">' + esc(c.finish) + '</span></td>' +
+      '<td>' + c.qty + '</td>' +
+      '<td class="price">' + eur(c.price) + '</td>' +
+      '<td class="price">' + eur((c.price||0)*c.qty) + '</td>' +
+      '<td class="mut">' + fmtDate(c.priceDate) + '</td>' +
+      '<td class="rowactions">' +
+        '<button class="btn-sec btn-mini" data-act="refresh" data-i="' + idx + '" title="Rafraîchir la cote">🔄</button> ' +
+        '<button class="btn-sec btn-mini" data-act="minus" data-i="' + idx + '">−</button>' +
+        '<button class="btn-sec btn-mini" data-act="plus" data-i="' + idx + '">+</button> ' +
+        '<button class="btn-sec btn-mini" data-act="del" data-i="' + idx + '">🗑</button>' +
+      '</td></tr>';
+  }).join("");
+  tb.querySelectorAll("button[data-act]").forEach(btn => btn.onclick = () => rowAction(btn.dataset.act, +btn.dataset.i));
+}
+
+async function rowAction(act, i) {
+  const c = ui.coll[i]; if (!c) return;
+  if (act === "del") { ui.coll.splice(i, 1); save(); render(); }
+  else if (act === "plus") { c.qty++; save(); render(); }
+  else if (act === "minus") { if (--c.qty < 1) ui.coll.splice(i, 1); save(); render(); }
+  else if (act === "refresh") { toast("Cote en cours…"); const p = await getPrice(c.id, c.finish); c.price = p.price; c.source = p.source; c.priceDate = p.price != null ? new Date().toISOString() : null; save(); render(); toast(p.price != null ? ("Cote : " + eur(p.price)) : "Cote indisponible", p.price == null); }
+  else if (act === "photo") attachPhoto(i);
+}
+
+function attachPhoto(i) {
+  const inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*";
+  inp.onchange = () => {
+    const f = inp.files[0]; if (!f) return;
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement("canvas");
+      const s = Math.min(1, 300 / Math.max(img.width, img.height));
+      cv.width = img.width * s; cv.height = img.height * s;
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+      ui.coll[i].photo = cv.toDataURL("image/jpeg", 0.7);
+      URL.revokeObjectURL(img.src); save(); render();
     };
-  } else {
-    main.innerHTML =
-      (ui.refreshMsg ? '<div class="okmsg">' + esc(ui.refreshMsg) + '</div>' : "") +
-      (ui.error ? '<p class="err">' + esc(ui.error) + '</p>' : "") +
-      (cards.length === 0 ? '<div class="card empty"><div style="font-size:2.2rem">🗃️</div><b>Ta collection est vide.</b><br><span style="font-size:.85rem">Appuie sur « + Ajouter une carte » pour commencer.</span></div>'
-       : listHtml(total, totalFR, totalCards, pricedCount, pricedFRCount));
+    img.src = URL.createObjectURL(f);
+  };
+  inp.click();
+}
+
+async function refreshAll() {
+  if (ui.busy) return; ui.busy = true;
+  const btn = $("btnRefreshAll"); btn.disabled = true;
+  const items = ui.coll.slice();
+  let n = 0;
+  for (let k = 0; k < items.length; k += 4) {
+    await Promise.all(items.slice(k, k + 4).map(async c => {
+      const p = await getPrice(c.id, c.finish);
+      c.price = p.price; c.source = p.source;
+      c.priceDate = p.price != null ? new Date().toISOString() : null; n++;
+    }));
+    btn.textContent = "🔄 " + n + "/" + items.length;
+    save(); render();
   }
-  document.getElementById("footer").innerHTML =
-    "Cotes US via <b>Pokétrace</b> (plan gratuit : TCGPlayer + eBay, USD, 250 requêtes/jour). " +
-    "Pour la cote française : cherche le lien exact sur Cardmarket, colle-le (🔗) et note la cote (✎). Collection enregistrée dans ce navigateur." +
-    (ui.quota ? '<br>Quota Pokétrace : ' + ui.quota.remaining + " requête(s) restante(s) sur " + ui.quota.limit + " (réinitialisation à minuit UTC)." : "");
+  btn.textContent = "🔄 Rafraîchir toutes les cotes"; btn.disabled = false; ui.busy = false;
+  toast("Cotes mises à jour (" + n + ")");
 }
 
-function keyHtml() {
-  return '<section class="card keycard"><h2>🔑 Clé API Pokétrace</h2>' +
-    '<p class="muted">L\'application fonctionne avec votre clé API Pokétrace (gratuite : <a href="https://poketrace.com/dashboard" target="_blank" rel="noopener">poketrace.com/dashboard</a>). ' +
-    'La clé est enregistrée uniquement dans ce navigateur.</p>' +
-    (ui.error ? '<p class="err">' + esc(ui.error) + '</p>' : "") +
-    '<div class="row"><input type="text" id="keyInput" style="flex:1" placeholder="pc_..." value="' + esc(ui.keyInput) + '">' +
-    '<button class="btn primary" onclick="saveKey()">Valider</button></div>' +
-    '<p class="muted" style="margin-top:10px">Astuce : sur cette page publique (GitHub Pages), la clé n\'est visible que par vous — elle reste dans le stockage local de Safari, pas dans le fichier.</p></section>';
-}
-function saveKey() {
-  const v = (document.getElementById("keyInput").value || "").trim();
-  if (!/^pc_[a-z0-9]+$/i.test(v)) { ui.error = "Format de clé invalide (elle commence par pc_)."; render(); return; }
-  apiKey = v; ui.keyInput = "";
-  try { localStorage.setItem(KEY_STORE, v); } catch (e) {}
-  ui.needKey = false; ui.error = null;
-  render();
-  loadQuota();
+function exportCsv() {
+  const head = ["Nom FR","Édition FR","Numéro","Rareté","Finition","Qté","Cote €","Total €","Source","Maj","ID"];
+  const rows = ui.coll.map(c => [c.name, c.setName, c.number, c.rarity, c.finish, c.qty, c.price ?? "", ((c.price)||0)*c.qty, c.source, fmtDate(c.priceDate), c.id]);
+  const csv = [head, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(";")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" }));
+  a.download = "collection-pokemon-v3.csv"; a.click(); URL.revokeObjectURL(a.href);
+  toast("CSV exporté");
 }
 
-function confirmHtml() {
-  const p = ui.pending;
-  const fr = frName(p.name);
-  return '<section class="card" style="border:2px solid #6ee7b7"><h2>✅ Confirmer l\'ajout</h2>' +
-    '<div class="row" style="align-items:flex-start">' +
-    '<img src="' + esc(p.photo || p.image || "") + '" style="width:90px;height:126px;object-fit:cover;border-radius:10px;background:#e2e8f0">' +
-    '<div style="flex:1;min-width:220px">' +
-    '<b>' + esc(fr) + '</b>' + (fr !== p.name ? ' <span style="color:#94a3b8;font-size:.8em">' + esc(p.name) + '</span>' : "") +
-    '<div class="meta">' + esc(frSet(p.set)) + ' · #' + esc(p.number) + " · " + esc(varLabel(p.variant)) + (p.rarity ? " · " + esc(p.rarity) : "") + '</div>' +
-    '<div class="meta" style="color:#059669;font-weight:600">Cote US : ' + fmtPrice(p.price) + (p.priceSource ? " (" + esc(p.priceSource) + ")" : "") + '</div>' +
-    '<div class="row" style="margin:10px 0">' +
-    (p.conditions && p.conditions.length > 1
-      ? '<label>État <select onchange="changePendingCondition(this.value)" style="margin-left:6px">' +
-        p.conditions.map((c) => '<option value="' + esc(c) + '"' + (c === p.condition ? " selected" : "") + '>' + esc(condLabel(c)) + '</option>').join("") + '</select></label>'
-      : '<span class="badge cond">' + esc(condLabel(p.condition)) + '</span>') +
-    '<label>Quantité <input type="number" id="pQty" min="1" value="' + p.qty + '" style="width:64px;margin-left:6px"></label>' +
-    '</div>' +
-    '<button class="btn green" onclick="confirmAdd()">Ajouter à ma collection</button> ' +
-    '<button class="btn line" onclick="cancelPending()">Annuler</button>' +
-    '</div></div></section>';
-}
-
-function listHtml(total, totalFR, totalCards, pricedCount, pricedFRCount) {
-  const sets = [...new Set(cards.map((c) => c.set))].sort((a, b) => a.localeCompare(b));
-  const q = ui.filterText.trim().toLowerCase();
-  const visible = cards.filter((c) => {
-    const nm = c.name.toLowerCase(), set = c.set.toLowerCase();
-    if (q && !(nm.includes(q) || frName(c.name).toLowerCase().includes(q) || set.includes(q) || frSet(c.set).toLowerCase().includes(q) || varLabel(c.variant).toLowerCase().includes(q))) return false;
-    if (ui.filterSet !== "all" && c.set !== ui.filterSet) return false;
-    if (ui.hideUnpriced && c.price == null) return false;
-    return true;
-  }).sort((a, b) => {
-    const d = ui.sortDesc ? -1 : 1;
-    if (ui.sortBy === "name") return d * frName(a.name).localeCompare(frName(b.name));
-    if (ui.sortBy === "set") return d * (a.set.localeCompare(b.set) || String(a.number).localeCompare(String(b.number), undefined, { numeric: true }));
-    if (ui.sortBy === "price") return d * ((a.price == null ? -Infinity : a.price) - (b.price == null ? -Infinity : b.price));
-    return d * key(a).localeCompare(key(b));
-  });
-  const vTotal = visible.reduce((s, c) => s + (c.price || 0) * c.qty, 0);
-  const vCount = visible.reduce((s, c) => s + c.qty, 0);
-  return '<section class="card filters"><div class="row">' +
-    '<input type="text" id="filterText" style="flex:1;min-width:180px" placeholder="🔍 Filtrer (nom FR/EN, édition, finition…)" value="' + esc(ui.filterText) + '">' +
-    '<label>Trier <select id="sortSel">' +
-    [["added","Ajout"],["name","Nom"],["set","Édition"],["price","Cote"]].map((o) =>
-      '<option value="' + o[0] + '"' + (ui.sortBy === o[0] ? " selected" : "") + '>' + o[1] + '</option>').join("") + '</select></label>' +
-    '<button class="btn line" onclick="ui.sortDesc=!ui.sortDesc;render()">' + (ui.sortDesc ? "↓" : "↑") + '</button>' +
-    '</div><div class="row">' +
-    '<label>Édition <select id="setSel"><option value="all">Toutes</option>' +
-    sets.map((s) => '<option value="' + esc(s) + '"' + (ui.filterSet === s ? " selected" : "") + '>' + esc(frSet(s)) + '</option>').join("") + '</select></label>' +
-    '<label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="hpChk" ' + (ui.hideUnpriced ? "checked" : "") + '> Masquer non cotées</label>' +
-    ((ui.filterText || ui.filterSet !== "all" || ui.hideUnpriced) ? '<button class="btn line" style="color:#059669" onclick="ui.filterText=\'\';ui.filterSet=\'all\';ui.hideUnpriced=false;render()">Réinitialiser</button>' : "") +
-    '<span style="margin-left:auto;color:#94a3b8;font-size:.75rem">' + vCount + " carte(s) · " + fmtPrice(vTotal) + '</span>' +
-    '</div></section>' +
-    '<div class="stats">' +
-    '<div class="stat"><div class="lab">Cartes</div><div class="val">' + totalCards + '</div></div>' +
-    '<div class="stat"><div class="lab">Cotées US</div><div class="val">' + pricedCount + "/" + cards.length + '</div></div>' +
-    '<div class="stat"><div class="lab">Valeur US</div><div class="val green">' + fmtPrice(total) + '</div></div>' +
-    (pricedFRCount > 0 ? '<div class="stat"><div class="lab">Valeur FR</div><div class="val" style="color:#059669">' + totalFR.toFixed(2) + ' €</div></div>' : "") +
-    '</div>' +
-    visible.map((c) => itemHtml(c)).join("") +
-    (visible.length === 0 ? '<div class="card empty" style="padding:20px">Aucune carte ne correspond aux filtres.</div>' : "");
-}
-function itemHtml(c) {
-  const k = key(c);
-  const holo = c.variant === "Holofoil" || c.variant === "Reverse_Holofoil" || /Holo/.test(c.variant || "");
-  const src = c.photo || c.image;
-  return '<div class="item">' +
-    '<img src="' + esc(src || "") + '" alt="">' +
-    '<div class="info"><div class="nm">' + esc(frName(c.name)) + (frName(c.name) !== c.name ? ' <span style="color:#94a3b8;font-size:.78em;font-weight:400">' + esc(c.name) + '</span>' : "") +
-    '<span class="badge qty">×' + c.qty + '</span>' +
-    '<span class="badge cond">' + esc(condLabel(c.condition)) + '</span>' +
-    (holo ? '<span class="badge holo">' + esc(varLabel(c.variant)) + '</span>' : "") +
-    '</div><div class="meta">' + esc(frSet(c.set)) + ' · #' + esc(c.number) + " · " + esc(varLabel(c.variant)) + '</div>' +
-    '<div class="meta">Cote US maj : ' + fmtDate(c.priceDate) + (c.priceSource ? " · " + esc(c.priceSource) : "") + '</div>' +
-    (c.priceFR != null ? '<div class="meta">🇫🇷 FR : <b style="color:#059669">' + c.priceFR.toFixed(2) + ' €</b> · ' + fmtDate(c.priceFRDate) + '</div>' : "") +
-    (c.cmExact ? '<div class="meta" style="word-break:break-all"><a href="' + esc(c.cmExact) + '" target="_blank" rel="noopener" style="color:#059669;font-size:.72rem">lien Cardmarket ✓</a></div>' : "") +
-    '</div>' +
-    '<div class="pricebox"><div class="price">' + fmtPrice(c.price) + '</div>' +
-    (c.priceFR != null ? '<div style="font-weight:700;color:#059669">' + c.priceFR.toFixed(2) + ' €</div>' : "") +
-    (c.price != null && c.qty > 1 ? '<div style="font-size:.68rem;color:#94a3b8">total ' + fmtPrice(c.price * c.qty) + '</div>' : "") +
-    '<div style="margin-top:4px">' +
-    '<button class="xbtn" onclick="promptCmLink(\'' + esc(k) + '\')" title="Coller le lien Cardmarket exact">🔗</button>' +
-    (c.cmExact ? '<button class="xbtn" onclick="promptFRPrice(\'' + esc(k) + '\')" title="Saisir / coller la cote FR (€)">✎</button>' : "") +
-    '<button class="xbtn" onclick="refreshCardByKey(\'' + esc(k) + '\')" ' + (ui.busyKeys.has(k) ? "disabled" : "") + ' title="Rafraîchir la cote US via Pokétrace">' + (ui.busyKeys.has(k) ? "…" : "🔄") + '</button>' +
-    '<button class="xbtn del" onclick="removeCard(\'' + esc(k) + '\')" title="Supprimer">✕</button></div></div></div>';
-}
-
-// Écoute des filtres
-document.getElementById("main").addEventListener("input", (ev) => {
-  if (ev.target.id === "filterText") { ui.filterText = ev.target.value; render(); }
-});
-document.getElementById("main").addEventListener("change", (ev) => {
-  if (ev.target.id === "sortSel") { ui.sortBy = ev.target.value; ui.sortDesc = ev.target.value === "price"; render(); }
-  if (ev.target.id === "setSel") { ui.filterSet = ev.target.value; render(); }
-  if (ev.target.id === "hpChk") { ui.hideUnpriced = ev.target.checked; render(); }
-});
-
-render();
-if (apiKey) loadQuota();
+// ---------- Init ----------
+$("btnSearch").onclick = () => { const v = $("q").value.trim(); if (v) searchCards(v); };
+$("q").addEventListener("keydown", e => { if (e.key === "Enter") $("btnSearch").click(); });
+$("fSearch").oninput = e => { ui.filters.q = e.target.value; render(); };
+$("fFinish").onchange = e => { ui.filters.finish = e.target.value; render(); };
+$("fSort").onchange = e => { ui.filters.sort = e.target.value; render(); };
+$("btnRefreshAll").onclick = refreshAll;
+$("btnCsv").onclick = exportCsv;
+load(); render();
 </script>
 </body>
 </html>
