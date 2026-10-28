@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ma Collection Pokémon</title>
+<title>Ma Collection Pokémon — Pokétrace</title>
 <style>
   :root { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif; color: #1e293b; background: #f1f5f9; margin: 0; }
   * { box-sizing: border-box; }
-  header { background: linear-gradient(90deg,#4f46e5,#9333ea); color: #fff; padding: 18px 16px; }
+  header { background: linear-gradient(90deg,#0f766e,#059669); color: #fff; padding: 18px 16px; }
   .hwrap { max-width: 860px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
   h1 { font-size: 1.4rem; margin: 0; }
   .sub { color: rgba(255,255,255,.85); font-size: .85rem; margin-top: 2px; }
@@ -17,19 +17,19 @@
   h2 { font-size: 1.05rem; margin: 0 0 6px; }
   .muted { color: #64748b; font-size: .85rem; margin: 0 0 12px; }
   input[type=text], input[type=number], select { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: .9rem; font-family: inherit; background: #fff; }
-  input:focus, select:focus { outline: 2px solid #a5b4fc; border-color: #6366f1; }
+  input:focus, select:focus { outline: 2px solid #6ee7b7; border-color: #059669; }
   .btn { padding: 8px 14px; border-radius: 8px; border: none; font-size: .88rem; font-weight: 500; cursor: pointer; font-family: inherit; }
-  .btn.primary { background: #4f46e5; color: #fff; } .btn.primary:hover { background: #4338ca; }
+  .btn.primary { background: #059669; color: #fff; } .btn.primary:hover { background: #047857; }
   .btn.ghost { background: rgba(255,255,255,.15); color: #fff; } .btn.ghost:hover { background: rgba(255,255,255,.28); }
-  .btn.light { background: #fff; color: #4f46e5; } .btn.light:hover { background: #eef2ff; }
-  .btn.green { background: #059669; color: #fff; } .btn.green:hover { background: #047857; }
+  .btn.light { background: #fff; color: #059669; } .btn.light:hover { background: #d1fae5; }
+  .btn.green { background: #059669; color: #fff; }
   .btn.line { background: #fff; border: 1px solid #cbd5e1; color: #334155; } .btn.line:hover { background: #f8fafc; }
   .btn:disabled { opacity: .45; cursor: not-allowed; }
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .note { background: #eef2ff; color: #4f46e5; padding: 8px 12px; border-radius: 8px; font-size: .85rem; margin: 10px 0; }
+  .note { background: #d1fae5; color: #065f46; padding: 8px 12px; border-radius: 8px; font-size: .85rem; margin: 10px 0; }
   .err { color: #dc2626; font-size: .85rem; margin: 10px 0; }
   .okmsg { background: #d1fae5; color: #065f46; padding: 8px 12px; border-radius: 8px; font-size: .85rem; margin-bottom: 12px; }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 14px; }
   .stat { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 12px; text-align: center; }
   .stat .lab { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: #64748b; }
   .stat .val { font-size: 1.15rem; font-weight: 700; margin-top: 2px; }
@@ -40,24 +40,25 @@
   .item .nm { font-weight: 600; }
   .badge { display: inline-block; font-size: .68rem; border-radius: 99px; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
   .badge.qty { background: #f1f5f9; color: #334155; }
-  .badge.cond { background: #eef2ff; color: #4f46e5; }
+  .badge.cond { background: #d1fae5; color: #065f46; }
   .badge.holo { background: linear-gradient(90deg,#fde68a,#fef3c7); color: #92400e; font-weight: 600; }
   .meta { color: #64748b; font-size: .75rem; margin-top: 2px; }
   .pricebox { text-align: right; flex-shrink: 0; }
   .price { font-weight: 700; color: #059669; }
-  .xbtn { border: 1px solid #e2e8f0; background: #fff; border-radius: 6px; padding: 3px 8px; cursor: pointer; font-size: .78rem; margin-left: 4px; }
+  .xbtn { border: 1px solid #e2e8f0; background: #fff; border-radius: 6px; padding: 3px 8px; cursor: pointer; font-size: .78rem; margin-left: 4px; font-family: inherit; }
   .xbtn.del { border-color: #fecaca; color: #dc2626; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 12px; }
   .rbtn { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0; cursor: pointer; overflow: hidden; text-align: left; }
-  .rbtn:hover { border-color: #818cf8; box-shadow: 0 2px 8px rgba(99,102,241,.2); }
-  .rbtn img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
+  .rbtn:hover { border-color: #34d399; box-shadow: 0 2px 8px rgba(5,150,105,.2); }
+  .rbtn img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; background: #e2e8f0; }
   .rbtn .cap { padding: 6px 8px; font-size: .72rem; }
-  .spin { display: inline-block; width: 15px; height: 15px; border: 2px solid #cbd5e1; border-top-color: #6366f1; border-radius: 50%; animation: sp .7s linear infinite; vertical-align: -2px; margin-right: 6px; }
+  .spin { display: inline-block; width: 15px; height: 15px; border: 2px solid #cbd5e1; border-top-color: #059669; border-radius: 50%; animation: sp .7s linear infinite; vertical-align: -2px; margin-right: 6px; }
   @keyframes sp { to { transform: rotate(360deg); } }
   .filters .row { margin-bottom: 8px; }
   footer { max-width: 860px; margin: 0 auto; padding: 0 16px 30px; font-size: .72rem; color: #94a3b8; }
   code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
   .empty { text-align: center; color: #64748b; padding: 36px 0; }
+  .keycard { max-width: 520px; margin: 40px auto; }
 </style>
 </head>
 <body>
@@ -76,14 +77,13 @@
 <script>
 "use strict";
 // ============================================================
-// Application autonome : scanner / saisir des cartes Pokémon,
-// enregistrer la collection et rafraîchir les cotes à la demande.
+// Ma Collection Pokémon v2 — cotes via l'API Pokétrace.
+// Clé API stockée localement, quota affiché en temps réel.
 // ============================================================
-const API = "https://api.pokemontcg.io/v2";
-const STORAGE_KEY = "pkmn-collection-v1";
-const CONDITIONS = ["Mint","Near Mint","Excellent","Bonne","Correcte","Abîmée"];
+const PT = "https://api.poketrace.com/v1";
+const STORAGE_KEY = "pkmn-collection-v2";
+const KEY_STORE = "pkmn-pt-key";
 
-// ---------- Dictionnaire français → anglais ----------
 const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 const FR_POKE = {
   "abo":"Ekans", "abra":"Abra", "absol":"Absol", "aeromite":"Venomoth",
@@ -683,82 +683,32 @@ function cmUrl(c) {
   return "https://www.cardmarket.com/fr/Pokemon/Products/Singles?searchQuery=" + encodeURIComponent(c.name);
 }
 
-// ---------- Connexion API (direct puis proxys en repli) ----------
-const PROXY_ROUTES = [
-  { label: "directe", wrap: (u) => u },
-  { label: "proxy allorigins", wrap: (u) => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) },
-  { label: "proxy codetabs", wrap: (u) => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u) },
-  { label: "proxy jina", wrap: (u) => "https://r.jina.ai/" + u },
-];
-let lastRoute = null;
-async function fetchJson(url) {
-  let lastErr = null;
-  for (const route of PROXY_ROUTES) {
-    try {
-      const res = await fetch(route.wrap(url));
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const txt = await res.text();
-      const start = txt.indexOf("{");
-      if (start === -1) throw new Error("JSON illisible");
-      const json = JSON.parse(start === 0 ? txt : txt.slice(start));
-      lastRoute = route.label;
-      return json;
-    } catch (e) { lastErr = e; }
-  }
-  throw new Error("Connexion à l'API Pokemon TCG impossible (" + (lastErr && lastErr.message ? lastErr.message : "erreur réseau") + "). Vérifiez votre connexion internet et réessayez.");
-}
-async function apiSearch(query) {
-  const q = encodeURIComponent(query);
-  const json = await fetchJson(API + "/cards?q=" + q + "&pageSize=40&orderBy=set.releaseDate:desc");
-  if (!json || !Array.isArray(json.data)) throw new Error("Réponse API inattendue.");
-  return json.data;
-}
-async function apiGetCard(id) {
-  try {
-    const json = await fetchJson(API + "/cards/" + encodeURIComponent(id));
-    return (json && json.data) || null;
-  } catch (e) { return null; }
-}
-const VARIANT_LABELS = { normal: "Normal", holofoil: "Holo", reverseHolofoil: "Reverse Holo" };
-const variantLabel = (k) => VARIANT_LABELS[k] || k;
-function availableVariants(card) {
-  const tp = (card && card.tcgplayer && card.tcgplayer.prices) || {};
-  return Object.keys(tp)
-    .filter((k) => tp[k] && typeof tp[k].market === "number")
-    .map((k) => ({ key: variantLabel(k), price: tp[k].market }));
-}
-function extractPrice(card, variant) {
-  const tp = (card && card.tcgplayer && card.tcgplayer.prices) || {};
-  if (variant) {
-    for (const k of Object.keys(tp)) {
-      if (variantLabel(k) === variant && typeof tp[k].market === "number") return { market: tp[k].market, source: "TCGPlayer market" };
-    }
-  }
-  for (const k of Object.keys(tp)) if (typeof tp[k].market === "number") return { market: tp[k].market, source: "TCGPlayer market" };
-  const cm = card && card.cardmarket && card.cardmarket.prices;
-  if (cm && typeof cm.averageSellPrice === "number") return { market: cm.averageSellPrice, source: "CardMarket moyenne" };
-  if (cm && typeof cm.trendPrice === "number") return { market: cm.trendPrice, source: "CardMarket tendance" };
-  return { market: null, source: "" };
-}
 
 // ---------- État ----------
+let apiKey = "";
+try { apiKey = localStorage.getItem(KEY_STORE) || ""; } catch (e) {}
 let cards = [];
-try {
-  cards = (JSON.parse(localStorage.getItem(STORAGE_KEY)) || []).map((c) => Object.assign({ variant: "Normal" }, c));
-} catch (e) { cards = []; }
+try { cards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { cards = []; }
 function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cards)); } catch (e) {} }
 const ui = {
-  tab: "list", search: "", results: [], searching: false, error: null, note: null,
-  pending: null, pendingVariants: [], photo: null,
+  tab: "list", needKey: !apiKey, keyInput: "",
+  search: "", results: [], searching: false, error: null, note: null,
+  pending: null, photo: null,
   sortBy: "added", sortDesc: false, filterText: "", filterSet: "all", hideUnpriced: false,
   refreshing: false, refreshMsg: null, busyKeys: new Set(),
+  quota: null, busyKey: false,
 };
 
 // ---------- Utilitaires ----------
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const fmtPrice = (v) => (v == null ? "—" : v.toFixed(2) + " $");
 const fmtDate = (iso) => iso ? new Date(iso).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : "—";
-const key = (c) => c.id + "|" + c.variant;
+const key = (c) => c.id + "|" + c.variant + "|" + c.condition;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const COND_LABELS = { MINT: "Mint", NEAR_MINT: "Near Mint", EXCELLENT: "Excellente", GOOD: "Bonne", LIGHTLY_PLAYED: "Peu jouée", MODERATELY_PLAYED: "Jouée", HEAVILY_PLAYED: "Très jouée", DAMAGED: "Abîmée" };
+const condLabel = (c) => COND_LABELS[c] || c;
+const VAR_LABELS = { Normal: "Normale", Holofoil: "Holo", Reverse_Holofoil: "Reverse Holo", "1st_Edition": "1ère édition", "1st_Edition_Holofoil": "1ère éd. Holo", Unlimited: "Illimitée" };
+const varLabel = (v) => VAR_LABELS[v] || v;
 
 function compressImage(file, maxSize, cb) {
   const reader = new FileReader();
@@ -776,6 +726,159 @@ function compressImage(file, maxSize, cb) {
   reader.readAsDataURL(file);
 }
 
+// ---------- Connexion Pokétrace (throttle 1 req / 2,2 s) ----------
+let lastReqTime = 0;
+async function ptFetch(path) {
+  const wait = 2200 - (Date.now() - lastReqTime);
+  if (wait > 0) await sleep(wait);
+  lastReqTime = Date.now();
+  let res;
+  try {
+    res = await fetch(PT + path, { headers: { "X-API-Key": apiKey } });
+  } catch (e) {
+    throw new Error("Connexion à Pokétrace impossible. Vérifiez votre connexion internet.");
+  }
+  if (res.status === 401 || res.status === 403) {
+    ui.needKey = true;
+    throw new Error("Clé API refusée par Pokétrace (code " + res.status + "). Vérifiez votre clé sur poketrace.com/dashboard.");
+  }
+  if (res.status === 429) throw new Error("Limite de requêtes atteinte (Pokétrace). Attendez quelques secondes ou réessayez demain.");
+  if (!res.ok) throw new Error("Erreur Pokétrace (code " + res.status + ").");
+  return res.json();
+}
+async function loadQuota() {
+  try {
+    const j = await ptFetch("/auth/info");
+    if (j && j.data && j.data.user) ui.quota = j.data.user;
+    render();
+  } catch (e) { ui.error = e.message; render(); }
+}
+
+// ---------- Prix ----------
+function priceFromCard(cardData, condition) {
+  if (!cardData || !cardData.prices) return { market: null, source: null };
+  const cond = condition || (cardData.conditionOptions && cardData.conditionOptions[0]) || "NEAR_MINT";
+  const srcs = ["tcgplayer", "ebay"];
+  for (const s of srcs) {
+    const t = cardData.prices[s];
+    if (!t) continue;
+    const p = t[cond];
+    if (p && typeof p.avg === "number") return { market: p.avg, source: s === "tcgplayer" ? "TCGPlayer (" + condLabel(cond) + ")" : "eBay (" + condLabel(cond) + ")" };
+  }
+  // repli : n'importe quelle condition dispo
+  for (const s of srcs) {
+    const t = cardData.prices[s];
+    if (!t) continue;
+    const kk = Object.keys(t)[0];
+    if (t[kk] && typeof t[kk].avg === "number") return { market: t[kk].avg, source: s === "tcgplayer" ? "TCGPlayer (" + condLabel(kk) + ")" : "eBay (" + condLabel(kk) + ")" };
+  }
+  return { market: null, source: null };
+}
+function variantsOf(cardData) {
+  const out = [];
+  const prices = (cardData && cardData.prices) || {};
+  for (const s of ["tcgplayer", "ebay"]) {
+    const t = prices[s];
+    if (!t) continue;
+    for (const cond of Object.keys(t)) if (out.indexOf(cond) === -1) out.push(cond);
+  }
+  return out;
+}
+
+// ---------- Recherche ----------
+async function runSearch(ev) {
+  if (ev) ev.preventDefault();
+  const q = document.getElementById("searchInput").value.trim();
+  if (!q) return;
+  ui.search = q; ui.searching = true; ui.error = null; ui.note = null; ui.results = [];
+  render();
+  try {
+    const fr = translateQuery(q);
+    const en = fr && fr !== q ? fr : q;
+    if (fr && fr.toLowerCase() !== q.toLowerCase()) ui.note = "Recherche traduite : « " + en + " » (depuis « " + q + " »)";
+    const j = await ptFetch("/cards?search=" + encodeURIComponent(en) + "&market=US&limit=24&product_type=single");
+    ui.results = (j && j.data) || [];
+    if (ui.results.length === 0) {
+      const sg = suggestFr(q);
+      ui.error = "Aucune carte trouvée pour « " + q + " »." + (sg.length ? " Vouliez-vous dire : " + sg.join(", ") + " ?" : "");
+    }
+  } catch (e) { ui.error = e.message || "Erreur réseau"; }
+  ui.searching = false; render();
+}
+function pickResult(id) {
+  const r = ui.results.find((x) => x.id === id);
+  if (!r) return;
+  const conds = (r.conditionOptions && r.conditionOptions.length) ? r.conditionOptions : variantsOf(r);
+  const cond = conds.indexOf("NEAR_MINT") >= 0 ? "NEAR_MINT" : (conds[0] || "NEAR_MINT");
+  const p = priceFromCard(r, cond);
+  ui.pending = {
+    id: r.id, name: r.name, set: (r.set && r.set.name) || "?",
+    number: r.cardNumber || "", variant: r.variant || "Normal", rarity: r.rarity || "",
+    image: r.image || null, conditions: conds, condition: cond,
+    photo: ui.photo, qty: 1,
+    price: p.market, priceDate: p.market != null ? new Date().toISOString() : null, priceSource: p.source,
+  };
+  render();
+}
+function changePendingCondition(cond) {
+  const r = ui.results.find((x) => x.id === ui.pending.id);
+  const p = priceFromCard(r, cond);
+  ui.pending.condition = cond;
+  ui.pending.price = p.market;
+  ui.pending.priceDate = p.market != null ? new Date().toISOString() : null;
+  ui.pending.priceSource = p.source;
+  render();
+}
+function cancelPending() { ui.pending = null; render(); }
+function clearPhoto() { ui.photo = null; render(); }
+function switchTab(t) { ui.tab = t; render(); }
+function confirmAdd() {
+  if (!ui.pending) return;
+  ui.pending.qty = Math.max(1, parseInt(document.getElementById("pQty").value, 10) || 1);
+  const i = cards.findIndex((c) => c.id === ui.pending.id && c.variant === ui.pending.variant && c.condition === ui.pending.condition);
+  if (i >= 0) cards[i].qty += ui.pending.qty;
+  else cards.push(ui.pending);
+  save();
+  ui.pending = null; ui.photo = null; ui.results = []; ui.tab = "list";
+  render();
+}
+function removeCard(k) { cards = cards.filter((c) => key(c) !== k); save(); render(); }
+
+// ---------- Cotes ----------
+async function refreshCard(c, silent) {
+  const k = key(c);
+  if (!silent) { ui.busyKeys.add(k); render(); }
+  try {
+    const j = await ptFetch("/cards/" + encodeURIComponent(c.id));
+    const fresh = j && j.data;
+    const i = cards.findIndex((x) => key(x) === k);
+    if (fresh && i >= 0) {
+      const p = priceFromCard(fresh, c.condition);
+      cards[i].price = p.market;
+      cards[i].priceDate = p.market != null ? new Date().toISOString() : null;
+      cards[i].priceSource = p.source;
+      save();
+    }
+  } catch (e) { if (!silent) { ui.error = e.message; } }
+  ui.busyKeys.delete(k); render();
+}
+async function refreshCardByKey(k) { const c = cards.find((x) => key(x) === k); if (c) refreshCard(c); }
+async function refreshAll() {
+  if (!cards.length || ui.refreshing) return;
+  ui.refreshing = true; ui.refreshMsg = "Actualisation des cotes… 0/" + cards.length; render();
+  let done = 0;
+  for (const c of cards) {
+    await refreshCard(c, true);
+    done++;
+    ui.refreshMsg = "Actualisation des cotes… " + done + "/" + cards.length;
+    render();
+  }
+  ui.refreshing = false;
+  ui.refreshMsg = "Cotes actualisées : " + done + " carte(s).";
+  render();
+  loadQuota();
+}
+
 // ---------- Lien Cardmarket exact + cote FR ----------
 function promptCmLink(k) {
   const c = cards.find((x) => key(x) === k);
@@ -783,15 +886,7 @@ function promptCmLink(k) {
   const v = (window.prompt("Colle ici le lien Cardmarket exact de la carte :", c.cmExact || "") || "").trim();
   if (!v) return;
   if (!/^https?:\/\/(www\.)?cardmarket\.com\//i.test(v)) { window.alert("Lien invalide : il doit pointer vers cardmarket.com."); return; }
-  c.cmExact = v;
-  save(); render();
-  fetchCMByKey(k);
-}
-function removeCmLink(k) {
-  const c = cards.find((x) => key(x) === k);
-  if (!c) return;
-  delete c.cmExact;
-  save(); render();
+  c.cmExact = v; save(); render();
 }
 function promptFRPrice(k) {
   const c = cards.find((x) => key(x) === k);
@@ -803,170 +898,22 @@ function promptFRPrice(k) {
   c.priceFR = num; c.priceFRDate = new Date().toISOString(); c.priceFRSource = "Cardmarket (saisie)";
   save(); render();
 }
-async function fetchCMPrice(url) {
-  const routes = [
-    { label: "allorigins", wrap: (u) => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) },
-    { label: "codetabs", wrap: (u) => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u) },
-    { label: "jina", wrap: (u) => "https://r.jina.ai/" + u },
-  ];
-  for (const route of routes) {
-    try {
-      const res = await fetch(route.wrap(url));
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const txt = await res.text();
-      if (!txt || /you have been blocked|Just a moment|Attention\! |Cloudflare/i.test(txt.slice(0, 4000))) throw new Error("bloqué");
-      let m = txt.match(/Tendance[\s\S]{0,400}?(\d{1,3}(?:[ .]\d{3})*[.,]\d{1,2})\s*€/) || txt.match(/Trend[\s\S]{0,400}?(\d{1,3}(?:[ .]\d{3})*[.,]\d{1,2})\s*€/) || txt.match(/(?:partir de|from)[\s\S]{0,80}?(\d{1,3}(?:[ .]\d{3})*[.,]\d{1,2})\s*€/) || txt.match(/(\d+[.,]\d{2})\s*€/);
-      if (m) {
-        const val = /,/.test(m[1]) ? parseFloat(m[1].replace(/\./g, "").replace(",", ".")) : parseFloat(m[1]);
-        if (isFinite(val) && val > 0 && val < 100000) return { price: val, via: route.label };
-      }
-    } catch (e) { /* on tente la route suivante */ }
-  }
-  return null;
-}
-async function fetchCMByKey(k) {
-  const c = cards.find((x) => key(x) === k);
-  if (!c || !c.cmExact || ui.busyFR && ui.busyFR.has(k)) return;
-  ui.busyFR = ui.busyFR || new Set();
-  ui.busyFR.add(k); render();
-  const r = await fetchCMPrice(c.cmExact);
-  const i = cards.findIndex((x) => key(x) === k);
-  if (r && i >= 0) {
-    cards[i].priceFR = r.price;
-    cards[i].priceFRDate = new Date().toISOString();
-    cards[i].priceFRSource = "Cardmarket (auto, " + r.via + ")";
-    save();
-    ui.refreshMsg = "Cote FR récupérée automatiquement pour " + frName(cards[i].name) + " : " + r.price.toFixed(2) + " € (via " + r.via + ").";
-  } else {
-    ui.refreshMsg = "Lecture automatique de Cardmarket impossible (site protégé). Ouvre la fiche avec 🔗 puis colle la cote avec ✎.";
-  }
-  ui.busyFR.delete(k); render();
-}
 
-// ---------- Actions ----------
-async function runSearch(ev) {
-  if (ev) ev.preventDefault();
-  const q = document.getElementById("searchInput").value.trim();
-  if (!q) return;
-  ui.search = q; ui.searching = true; ui.error = null; ui.note = null; ui.results = [];
-  render();
-  try {
-    const fr = translateQuery(q);
-    const build = (s) => (/[:"]/.test(s) ? s : 'name:"' + s + '"');
-    const attempts = [];
-    if (fr && fr.toLowerCase() !== q.toLowerCase()) attempts.push({ q: fr, label: "Recherche traduite : « " + fr + " » (depuis « " + q + " »)" });
-    attempts.push({ q: q, label: null });
-    let r = [], used = null;
-    for (const a of attempts) {
-      r = await apiSearch(build(a.q));
-      if (r.length > 0) { used = a.label; break; }
-    }
-    ui.results = r; ui.note = used;
-    if (r.length === 0) {
-      const sg = suggestFr(q);
-      ui.error = "Aucune carte trouvée pour « " + q + " »." + (sg.length ? " Vouliez-vous dire : " + sg.join(", ") + " ?" : "");
-    }
-  } catch (e) { ui.error = e.message || "Erreur réseau"; }
-  ui.searching = false;
-  render();
-}
-function pickResult(id) {
-  const apiCard = ui.results.find((r) => r.id === id);
-  if (!apiCard) return;
-  const variants = availableVariants(apiCard);
-  const def = variants.find((v) => v.key === "Normal") || variants[0];
-  const p = def ? { market: def.price, source: "TCGPlayer market" } : extractPrice(apiCard);
-  ui.pendingVariants = variants;
-  ui.pending = {
-    id: apiCard.id, variant: def ? def.key : "Normal",
-    name: apiCard.name, set: (apiCard.set && apiCard.set.name) || "?",
-    number: apiCard.number || "", rarity: apiCard.rarity || "",
-    imageUrl: (apiCard.images && apiCard.images.large) || null,
-    imageSmall: (apiCard.images && apiCard.images.small) || null,
-    photo: ui.photo, qty: 1, condition: "Near Mint",
-    price: p.market, priceDate: p.market != null ? new Date().toISOString() : null,
-    priceSource: p.source || null,
-  };
-  render();
-}
-function changePendingVariant(v) {
-  const pv = ui.pendingVariants.find((x) => x.key === v);
-  ui.pending.variant = v;
-  ui.pending.price = pv ? pv.price : null;
-  ui.pending.priceDate = (pv && pv.price != null) ? new Date().toISOString() : null;
-  ui.pending.priceSource = pv ? "TCGPlayer market" : null;
-  render();
-}
-function cancelPending() { ui.pending = null; ui.pendingVariants = []; render(); }
-function clearPhoto() { ui.photo = null; render(); }
-function switchTab(t) { ui.tab = t; render(); }
-function confirmAdd() {
-  if (!ui.pending) return;
-  ui.pending.qty = Math.max(1, parseInt(document.getElementById("pQty").value, 10) || 1);
-  ui.pending.condition = document.getElementById("pCond").value;
-  const i = cards.findIndex((c) => c.id === ui.pending.id && c.variant === ui.pending.variant);
-  if (i >= 0) cards[i].qty += ui.pending.qty;
-  else cards.push(ui.pending);
-  save();
-  ui.pending = null; ui.pendingVariants = []; ui.photo = null; ui.results = []; ui.tab = "list";
-  render();
-}
-function removeCard(k) {
-  cards = cards.filter((c) => key(c) !== k);
-  save(); render();
-}
-async function refreshCard(c) {
-  const k = key(c);
-  ui.busyKeys.add(k); render();
-  const fresh = await apiGetCard(c.id);
-  const i = cards.findIndex((x) => key(x) === k);
-  if (fresh && i >= 0) {
-    const p = extractPrice(fresh, c.variant);
-    cards[i].price = p.market;
-    cards[i].priceDate = p.market != null ? new Date().toISOString() : null;
-    cards[i].priceSource = p.source || null;
-    save();
-  }
-  ui.busyKeys.delete(k); render();
-}
-function refreshCardByKey(k) {
-  const c = cards.find((x) => key(x) === k);
-  if (c) refreshCard(c);
-}
-async function refreshAll() {
-  if (!cards.length || ui.refreshing) return;
-  ui.refreshing = true; ui.refreshMsg = null; render();
-  let updated = 0;
-  for (let i = 0; i < cards.length; i += 4) {
-    await Promise.all(cards.slice(i, i + 4).map(async (c) => {
-      const fresh = await apiGetCard(c.id);
-      if (fresh) {
-        const p = extractPrice(fresh, c.variant);
-        if (p.market != null) {
-          c.price = p.market; c.priceDate = new Date().toISOString(); c.priceSource = p.source;
-          updated++;
-        }
-      }
-    }));
-    save(); render();
-  }
-  ui.refreshing = false;
-  ui.refreshMsg = "Cotes US actualisées : " + updated + "/" + cards.length + " carte(s).";
-  render();
-}
+// ---------- Export CSV ----------
 function exportCSV() {
-  const headers = ["Nom (FR)","Nom (EN)","Édition (FR)","Édition (EN)","Numéro","Rareté","Variante","État","Quantité","Cote US ($, indicative)","Cote × Qté ($)","Lien Cardmarket","Cote FR (€)","Cote FR × Qté (€)","Cote FR maj","Source FR","Dernière maj US","ID API","Photo perso"];
+  const headers = ["Nom (FR)","Nom (EN)","Édition (FR)","Édition (EN)","Numéro","Variante","Rareté","État","Quantité","Cote US ($)","Cote × Qté ($)","Source US","Maj US","Lien Cardmarket","Cote FR (€)","Cote FR × Qté (€)","Maj FR","ID Pokétrace","Photo perso"];
   const e = (v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
   const total = cards.reduce((s, c) => s + (c.price || 0) * c.qty, 0);
   const totalFR = cards.reduce((s, c) => s + (c.priceFR || 0) * c.qty, 0);
   const totalCards = cards.reduce((s, c) => s + c.qty, 0);
   const rows = cards.map((c) => [
-    e(frName(c.name)), e(c.name), e(frSet(c.set)), e(c.set), e(c.number), e(c.rarity), e(c.variant), e(c.condition), c.qty,
+    e(frName(c.name)), e(c.name), e(frSet(c.set)), e(c.set), e(c.number), e(varLabel(c.variant)), e(c.rarity), e(condLabel(c.condition)), c.qty,
     c.price != null ? c.price.toFixed(2) : "", c.price != null ? (c.price * c.qty).toFixed(2) : "",
-    e(c.cmExact || ""), c.priceFR != null ? c.priceFR.toFixed(2) : "", c.priceFR != null ? (c.priceFR * c.qty).toFixed(2) : "",
-    e(c.priceFRDate), e(c.priceFRSource), e(c.priceDate), e(c.id), c.photo ? "oui" : "non",
+    e(c.priceSource), e(c.priceDate), e(c.cmExact || ""),
+    c.priceFR != null ? c.priceFR.toFixed(2) : "", c.priceFR != null ? (c.priceFR * c.qty).toFixed(2) : "",
+    e(c.priceFRDate), e(c.id), c.photo ? "oui" : "non",
   ].join(";"));
-  const csv = "\uFEFF" + headers.join(";") + "\n" + rows.join("\n") + "\n" + ["TOTAL","","","","","","","",totalCards,"",total.toFixed(2),"",totalFR.toFixed(2),"","","","","","","",""].join(";");
+  const csv = "\uFEFF" + headers.join(";") + "\n" + rows.join("\n") + "\n" + ["TOTAL","","","","","","","",totalCards,"",total.toFixed(2),"","","",totalFR.toFixed(2),"","","",""].join(";");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -983,39 +930,42 @@ function render() {
   const pricedCount = cards.filter((c) => c.price != null).length;
   const pricedFRCount = cards.filter((c) => c.priceFR != null).length;
   document.getElementById("subTitle").textContent =
-    totalCards + " carte" + (totalCards > 1 ? "s" : "") + " · Valeur US : " + fmtPrice(total) + (pricedFRCount > 0 ? " · Valeur FR : " + totalFR.toFixed(2) + " €" : "");
+    totalCards + " carte" + (totalCards > 1 ? "s" : "") + " · Valeur US : " + fmtPrice(total) +
+    (pricedFRCount > 0 ? " · Valeur FR : " + totalFR.toFixed(2) + " €" : "") +
+    (ui.quota ? " · ⚡ " + ui.quota.remaining + "/" + ui.quota.limit + " requêtes aujourd'hui" : "");
   document.getElementById("hbtns").innerHTML =
-    '<button class="btn ghost" onclick="refreshAll()" ' + (ui.refreshing || !cards.length ? "disabled" : "") + '>' +
-    (ui.refreshing ? "Actualisation…" : "🔄 Rafraîchir les cotes") + '</button>' +
-    '<button class="btn ghost" onclick="exportCSV()" ' + (!cards.length ? "disabled" : "") + '>⬇️ Export CSV</button>' +
-    '<button class="btn light" onclick="switchTab(\'' + (ui.tab === "list" ? "add" : "list") + '\')">' +
-    (ui.tab === "list" ? "+ Ajouter une carte" : "← Retour à la liste") + '</button>';
-
+    (ui.tab === "list"
+      ? '<button class="btn ghost" onclick="refreshAll()" ' + (ui.refreshing || !cards.length ? "disabled" : "") + '>' + (ui.refreshing ? "Actualisation…" : "🔄 Rafraîchir les cotes") + '</button>' +
+        '<button class="btn ghost" onclick="exportCSV()" ' + (!cards.length ? "disabled" : "") + '>⬇️ Export CSV</button>' +
+        '<button class="btn light" onclick="switchTab(\'add\')">+ Ajouter une carte</button>'
+      : '<button class="btn light" onclick="switchTab(\'list\')">← Retour à la liste</button>');
   const main = document.getElementById("main");
+  if (ui.needKey) { main.innerHTML = keyHtml(); return; }
   if (ui.tab === "add") {
     main.innerHTML =
-      '<section class="card"><h2>📸 Scanner une carte</h2>' +
-      '<p class="muted">Prends la carte en photo : elle sera jointe à la fiche. Puis identifie la carte via la recherche ci-dessous (nom + édition).</p>' +
+      '<section class="card"><h2>📸 Photo de la carte (optionnel)</h2>' +
+      '<p class="muted">La photo est jointe à la fiche pour mémoire. La carte est identifiée par la recherche ci-dessous.</p>' +
       '<input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none">' +
       '<div class="row">' +
       '<button class="btn primary" onclick="document.getElementById(\'photoInput\').click()">' + (ui.photo ? "Changer la photo" : "Prendre / choisir une photo") + '</button>' +
-      (ui.photo ? '<img src="' + ui.photo + '" style="width:52px;height:72px;object-fit:cover;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.2)">' +
+      (ui.photo ? '<img src="' + ui.photo + '" style="width:52px;height:72px;object-fit:cover;border-radius:6px">' +
         '<button class="btn line" onclick="clearPhoto()">Retirer</button>' : "") +
       '</div></section>' +
-      '<section class="card"><h2>🔎 Saisir le nom et l\'édition</h2>' +
-      '<p class="muted">Le nom français est reconnu automatiquement ! Exemples : <code>dracaufeu</code>, <code>tortank edition de base</code></p>' +
+      '<section class="card"><h2>🔎 Rechercher une carte</h2>' +
+      '<p class="muted">Noms français reconnus (dictionnaire : ' + Object.keys(FR_POKE).length + ' noms). Exemples : <code>exagide</code>, <code>dracaufeu</code>, <code>ptera</code>. Les résultats affichent les différentes finitions.</p>' +
       '<form class="row" onsubmit="runSearch(event)">' +
-      '<input type="text" id="searchInput" style="flex:1;min-width:180px" placeholder="Nom de la carte (et édition si besoin)…" value="' + esc(ui.search) + '">' +
+      '<input type="text" id="searchInput" style="flex:1;min-width:180px" placeholder="Nom de la carte…" value="' + esc(ui.search) + '">' +
       '<button class="btn primary" type="submit" ' + (ui.searching ? "disabled" : "") + '>' + (ui.searching ? "…" : "Rechercher") + '</button></form>' +
       (ui.searching ? '<p class="muted" style="margin-top:10px"><span class="spin"></span>Recherche en cours…</p>' : "") +
       (ui.note ? '<div class="note">🇫🇷→🇬🇧 ' + esc(ui.note) + '</div>' : "") +
       (ui.error ? '<p class="err">' + esc(ui.error) + '</p>' : "") +
       '<div class="grid">' + ui.results.map((r) =>
         '<button class="rbtn" onclick="pickResult(\'' + esc(r.id) + '\')">' +
-        (r.images && r.images.small ? '<img src="' + esc(r.images.small) + '" alt="">' : '') +
+        (r.image ? '<img src="' + esc(r.image) + '" alt="">' : '') +
         '<div class="cap"><b>' + esc(frName(r.name)) + '</b>' +
-        (frName(r.name) !== r.name ? '<br><span style="color:#94a3b8;font-size:.9em">' + esc(r.name) + '</span>' : '') +
-        '<br><span style="color:#64748b">' + esc(frSet((r.set && r.set.name) || "")) + ' · #' + esc(r.number) + '</span></div></button>'
+        (r.variant && r.variant !== "Normal" ? ' <span class="badge holo">' + esc(varLabel(r.variant)) + '</span>' : "") +
+        '<br><span style="color:#64748b">' + esc(frSet((r.set && r.set.name) || "")) + ' · #' + esc(r.cardNumber) + '</span>' +
+        '<br><span style="color:#059669;font-weight:600">' + fmtPrice(priceFromCard(r, null).market) + '</span></div></button>'
       ).join("") + '</div></section>' +
       (ui.pending ? confirmHtml() : "");
     const pi = document.getElementById("photoInput");
@@ -1027,71 +977,87 @@ function render() {
   } else {
     main.innerHTML =
       (ui.refreshMsg ? '<div class="okmsg">' + esc(ui.refreshMsg) + '</div>' : "") +
-      (cards.length === 0 ? '<div class="card empty"><div style="font-size:2.2rem">🗃️</div><b>Ta collection est vide.</b><br><span style="font-size:.85rem">Clique sur « + Ajouter une carte » pour scanner ou saisir une carte.</span></div>'
-       : listHtml(total, totalCards, pricedCount));
+      (ui.error ? '<p class="err">' + esc(ui.error) + '</p>' : "") +
+      (cards.length === 0 ? '<div class="card empty"><div style="font-size:2.2rem">🗃️</div><b>Ta collection est vide.</b><br><span style="font-size:.85rem">Appuie sur « + Ajouter une carte » pour commencer.</span></div>'
+       : listHtml(total, totalFR, totalCards, pricedCount, pricedFRCount));
   }
   document.getElementById("footer").innerHTML =
-    "Cotes US affichées à titre indicatif (TCGPlayer / eBay, USD). Cote FR : colle le lien Cardmarket exact d'une carte (🔗), puis tente la récupération auto (⤓) ou saisis la cote (✎) — lue sur la fiche Cardmarket, colonne « Tendance ». Valeurs FR en euros. La collection est enregistrée localement dans ce navigateur." +
-    (lastRoute ? '<span style="margin-left:8px;color:#64748b">· Connexion API : ' + esc(lastRoute) + ' ✓</span>' : "");
+    "Cotes US via <b>Pokétrace</b> (plan gratuit : TCGPlayer + eBay, USD, 250 requêtes/jour). " +
+    "Pour la cote française : cherche le lien exact sur Cardmarket, colle-le (🔗) et note la cote (✎). Collection enregistrée dans ce navigateur." +
+    (ui.quota ? '<br>Quota Pokétrace : ' + ui.quota.remaining + " requête(s) restante(s) sur " + ui.quota.limit + " (réinitialisation à minuit UTC)." : "");
+}
+
+function keyHtml() {
+  return '<section class="card keycard"><h2>🔑 Clé API Pokétrace</h2>' +
+    '<p class="muted">L\'application fonctionne avec votre clé API Pokétrace (gratuite : <a href="https://poketrace.com/dashboard" target="_blank" rel="noopener">poketrace.com/dashboard</a>). ' +
+    'La clé est enregistrée uniquement dans ce navigateur.</p>' +
+    (ui.error ? '<p class="err">' + esc(ui.error) + '</p>' : "") +
+    '<div class="row"><input type="text" id="keyInput" style="flex:1" placeholder="pc_..." value="' + esc(ui.keyInput) + '">' +
+    '<button class="btn primary" onclick="saveKey()">Valider</button></div>' +
+    '<p class="muted" style="margin-top:10px">Astuce : sur cette page publique (GitHub Pages), la clé n\'est visible que par vous — elle reste dans le stockage local de Safari, pas dans le fichier.</p></section>';
+}
+function saveKey() {
+  const v = (document.getElementById("keyInput").value || "").trim();
+  if (!/^pc_[a-z0-9]+$/i.test(v)) { ui.error = "Format de clé invalide (elle commence par pc_)."; render(); return; }
+  apiKey = v; ui.keyInput = "";
+  try { localStorage.setItem(KEY_STORE, v); } catch (e) {}
+  ui.needKey = false; ui.error = null;
+  render();
+  loadQuota();
 }
 
 function confirmHtml() {
   const p = ui.pending;
-  return '<section class="card" style="border:2px solid #a5b4fc"><h2>✅ Confirmer l\'ajout</h2>' +
+  const fr = frName(p.name);
+  return '<section class="card" style="border:2px solid #6ee7b7"><h2>✅ Confirmer l\'ajout</h2>' +
     '<div class="row" style="align-items:flex-start">' +
-    '<img src="' + esc(p.photo || p.imageSmall || p.imageUrl || "") + '" style="width:90px;height:126px;object-fit:cover;border-radius:10px;background:#e2e8f0">' +
+    '<img src="' + esc(p.photo || p.image || "") + '" style="width:90px;height:126px;object-fit:cover;border-radius:10px;background:#e2e8f0">' +
     '<div style="flex:1;min-width:220px">' +
-    '<b>' + esc(frName(p.name)) + '</b>' + (frName(p.name) !== p.name ? ' <span style="color:#94a3b8;font-size:.8em">' + esc(p.name) + '</span>' : "") +
-    '<div class="meta">' + esc(frSet(p.set)) + (frSet(p.set) !== p.set ? " (" + esc(p.set) + ")" : "") + ' · #' + esc(p.number) + (p.rarity ? " · " + esc(p.rarity) : "") + '</div>' +
-    '<div class="meta" style="color:#059669;font-weight:600">Cote US (indicative) : ' + fmtPrice(p.price) + (p.priceSource ? " (" + esc(p.priceSource) + ")" : "") + '</div>' +
-    '<div class="meta">🇫🇷 <a href="' + esc(cmUrl(p)) + '" target="_blank" rel="noopener" style="color:#4f46e5">Voir la cote française sur Cardmarket</a></div>' +
+    '<b>' + esc(fr) + '</b>' + (fr !== p.name ? ' <span style="color:#94a3b8;font-size:.8em">' + esc(p.name) + '</span>' : "") +
+    '<div class="meta">' + esc(frSet(p.set)) + ' · #' + esc(p.number) + " · " + esc(varLabel(p.variant)) + (p.rarity ? " · " + esc(p.rarity) : "") + '</div>' +
+    '<div class="meta" style="color:#059669;font-weight:600">Cote US : ' + fmtPrice(p.price) + (p.priceSource ? " (" + esc(p.priceSource) + ")" : "") + '</div>' +
     '<div class="row" style="margin:10px 0">' +
-    (ui.pendingVariants.length > 1
-      ? '<label>Finition <select onchange="changePendingVariant(this.value)" style="margin-left:6px">' +
-        ui.pendingVariants.map((v) => '<option value="' + esc(v.key) + '"' + (v.key === p.variant ? " selected" : "") + '>' + esc(v.key) + (v.price != null ? " — " + fmtPrice(v.price) : "") + '</option>').join("") + '</select></label>'
-      : '<span class="badge cond">Finition : ' + esc(p.variant) + '</span>') +
+    (p.conditions && p.conditions.length > 1
+      ? '<label>État <select onchange="changePendingCondition(this.value)" style="margin-left:6px">' +
+        p.conditions.map((c) => '<option value="' + esc(c) + '"' + (c === p.condition ? " selected" : "") + '>' + esc(condLabel(c)) + '</option>').join("") + '</select></label>'
+      : '<span class="badge cond">' + esc(condLabel(p.condition)) + '</span>') +
     '<label>Quantité <input type="number" id="pQty" min="1" value="' + p.qty + '" style="width:64px;margin-left:6px"></label>' +
-    '<label>État <select id="pCond" style="margin-left:6px">' +
-    CONDITIONS.map((c) => '<option' + (c === p.condition ? " selected" : "") + '>' + c + '</option>').join("") + '</select></label>' +
     '</div>' +
     '<button class="btn green" onclick="confirmAdd()">Ajouter à ma collection</button> ' +
     '<button class="btn line" onclick="cancelPending()">Annuler</button>' +
     '</div></div></section>';
 }
 
-function listHtml(total, totalCards, pricedCount) {
+function listHtml(total, totalFR, totalCards, pricedCount, pricedFRCount) {
   const sets = [...new Set(cards.map((c) => c.set))].sort((a, b) => a.localeCompare(b));
   const q = ui.filterText.trim().toLowerCase();
   const visible = cards.filter((c) => {
-    if (q && !(
-      c.name.toLowerCase().includes(q) || frName(c.name).toLowerCase().includes(q) ||
-      c.set.toLowerCase().includes(q) || frSet(c.set).toLowerCase().includes(q) ||
-      c.rarity.toLowerCase().includes(q) || c.variant.toLowerCase().includes(q))) return false;
+    const nm = c.name.toLowerCase(), set = c.set.toLowerCase();
+    if (q && !(nm.includes(q) || frName(c.name).toLowerCase().includes(q) || set.includes(q) || frSet(c.set).toLowerCase().includes(q) || varLabel(c.variant).toLowerCase().includes(q))) return false;
     if (ui.filterSet !== "all" && c.set !== ui.filterSet) return false;
     if (ui.hideUnpriced && c.price == null) return false;
     return true;
   }).sort((a, b) => {
     const d = ui.sortDesc ? -1 : 1;
-    if (ui.sortBy === "name") return d * a.name.localeCompare(b.name);
+    if (ui.sortBy === "name") return d * frName(a.name).localeCompare(frName(b.name));
     if (ui.sortBy === "set") return d * (a.set.localeCompare(b.set) || String(a.number).localeCompare(String(b.number), undefined, { numeric: true }));
     if (ui.sortBy === "price") return d * ((a.price == null ? -Infinity : a.price) - (b.price == null ? -Infinity : b.price));
-    if (ui.sortBy === "rarity") return d * (a.rarity || "").localeCompare(b.rarity || "");
     return d * key(a).localeCompare(key(b));
   });
   const vTotal = visible.reduce((s, c) => s + (c.price || 0) * c.qty, 0);
   const vCount = visible.reduce((s, c) => s + c.qty, 0);
   return '<section class="card filters"><div class="row">' +
-    '<input type="text" id="filterText" style="flex:1;min-width:180px" placeholder="🔍 Filtrer par nom, édition, n°, rareté, finition…" value="' + esc(ui.filterText) + '">' +
+    '<input type="text" id="filterText" style="flex:1;min-width:180px" placeholder="🔍 Filtrer (nom FR/EN, édition, finition…)" value="' + esc(ui.filterText) + '">' +
     '<label>Trier <select id="sortSel">' +
-    [["added","Ajout"],["name","Nom"],["set","Édition"],["price","Cote"],["rarity","Rareté"]].map((o) =>
+    [["added","Ajout"],["name","Nom"],["set","Édition"],["price","Cote"]].map((o) =>
       '<option value="' + o[0] + '"' + (ui.sortBy === o[0] ? " selected" : "") + '>' + o[1] + '</option>').join("") + '</select></label>' +
     '<button class="btn line" onclick="ui.sortDesc=!ui.sortDesc;render()">' + (ui.sortDesc ? "↓" : "↑") + '</button>' +
     '</div><div class="row">' +
     '<label>Édition <select id="setSel"><option value="all">Toutes</option>' +
-    sets.map((s) => '<option value="' + esc(s) + '"' + (ui.filterSet === s ? " selected" : "") + '>' + esc(frSet(s)) + (frSet(s) !== s ? "" : "") + '</option>').join("") + '</select></label>' +
-    '<label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="hpChk" ' + (ui.hideUnpriced ? "checked" : "") + '> Masquer les cartes non cotées</label>' +
-    ((ui.filterText || ui.filterSet !== "all" || ui.hideUnpriced) ? '<button class="btn line" style="color:#4f46e5" onclick="ui.filterText=\'\';ui.filterSet=\'all\';ui.hideUnpriced=false;render()">Réinitialiser</button>' : "") +
-    '<span style="margin-left:auto;color:#94a3b8;font-size:.75rem">' + vCount + " carte(s) affichée(s) · " + fmtPrice(vTotal) + '</span>' +
+    sets.map((s) => '<option value="' + esc(s) + '"' + (ui.filterSet === s ? " selected" : "") + '>' + esc(frSet(s)) + '</option>').join("") + '</select></label>' +
+    '<label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="hpChk" ' + (ui.hideUnpriced ? "checked" : "") + '> Masquer non cotées</label>' +
+    ((ui.filterText || ui.filterSet !== "all" || ui.hideUnpriced) ? '<button class="btn line" style="color:#059669" onclick="ui.filterText=\'\';ui.filterSet=\'all\';ui.hideUnpriced=false;render()">Réinitialiser</button>' : "") +
+    '<span style="margin-left:auto;color:#94a3b8;font-size:.75rem">' + vCount + " carte(s) · " + fmtPrice(vTotal) + '</span>' +
     '</div></section>' +
     '<div class="stats">' +
     '<div class="stat"><div class="lab">Cartes</div><div class="val">' + totalCards + '</div></div>' +
@@ -1100,38 +1066,34 @@ function listHtml(total, totalCards, pricedCount) {
     (pricedFRCount > 0 ? '<div class="stat"><div class="lab">Valeur FR</div><div class="val" style="color:#059669">' + totalFR.toFixed(2) + ' €</div></div>' : "") +
     '</div>' +
     visible.map((c) => itemHtml(c)).join("") +
-    (visible.length === 0 ? '<div class="card empty" style="padding:20px">Aucune carte ne correspond aux filtres actuels.</div>' : "");
+    (visible.length === 0 ? '<div class="card empty" style="padding:20px">Aucune carte ne correspond aux filtres.</div>' : "");
 }
 function itemHtml(c) {
   const k = key(c);
-  const holo = c.variant === "Holo" || c.variant === "Reverse Holo";
-  const src = c.photo || c.imageSmall || c.imageUrl;
+  const holo = c.variant === "Holofoil" || c.variant === "Reverse_Holofoil" || /Holo/.test(c.variant || "");
+  const src = c.photo || c.image;
   return '<div class="item">' +
     '<img src="' + esc(src || "") + '" alt="">' +
     '<div class="info"><div class="nm">' + esc(frName(c.name)) + (frName(c.name) !== c.name ? ' <span style="color:#94a3b8;font-size:.78em;font-weight:400">' + esc(c.name) + '</span>' : "") +
     '<span class="badge qty">×' + c.qty + '</span>' +
-    '<span class="badge cond">' + esc(c.condition) + '</span>' +
-    (holo ? '<span class="badge holo">' + (c.variant === "Holo" ? "✨ Holo" : "🔁 Reverse Holo") + '</span>' : "") +
-    '</div><div class="meta">' + esc(frSet(c.set)) + ' · #' + esc(c.number) + (c.rarity ? " · " + esc(c.rarity) : "") + " · " + esc(c.variant) + '</div>' +
-    '</div><div class="meta">Cote US (indicative) maj : ' + fmtDate(c.priceDate) + (c.priceSource ? " · " + esc(c.priceSource) : "") + '</div>' +
-    '<div class="meta">' + (c.priceFR != null
-      ? "🇫🇷 Cote FR : <b style='color:#059669'>" + c.priceFR.toFixed(2) + " €</b> · maj " + fmtDate(c.priceFRDate) + (c.priceFRSource ? " · " + esc(c.priceFRSource) : "")
-      : "🇫🇷 Cote FR : non renseignée" + (c.cmExact ? "" : " — colle le lien Cardmarket exact (🔗)")) + '</div>' +
-    (c.cmExact ? '<div class="meta" style="word-break:break-all"><a href="' + esc(c.cmExact) + '" target="_blank" rel="noopener" style="color:#4f46e5;font-size:.72rem">lien Cardmarket exact ✓</a> <button class="xbtn" style="margin-left:4px" onclick="removeCmLink(\'' + esc(k) + '\')" title="Retirer le lien">✕ lien</button></div>' : "") + '</div>' +
+    '<span class="badge cond">' + esc(condLabel(c.condition)) + '</span>' +
+    (holo ? '<span class="badge holo">' + esc(varLabel(c.variant)) + '</span>' : "") +
+    '</div><div class="meta">' + esc(frSet(c.set)) + ' · #' + esc(c.number) + " · " + esc(varLabel(c.variant)) + '</div>' +
+    '<div class="meta">Cote US maj : ' + fmtDate(c.priceDate) + (c.priceSource ? " · " + esc(c.priceSource) : "") + '</div>' +
+    (c.priceFR != null ? '<div class="meta">🇫🇷 FR : <b style="color:#059669">' + c.priceFR.toFixed(2) + ' €</b> · ' + fmtDate(c.priceFRDate) + '</div>' : "") +
+    (c.cmExact ? '<div class="meta" style="word-break:break-all"><a href="' + esc(c.cmExact) + '" target="_blank" rel="noopener" style="color:#059669;font-size:.72rem">lien Cardmarket ✓</a></div>' : "") +
+    '</div>' +
     '<div class="pricebox"><div class="price">' + fmtPrice(c.price) + '</div>' +
-    (c.priceFR != null ? '<div style="font-weight:700;color:#059669;margin-top:2px">' + c.priceFR.toFixed(2) + ' €</div>' + (c.qty > 1 ? '<div style="font-size:.68rem;color:#94a3b8">total FR ' + (c.priceFR * c.qty).toFixed(2) + ' €</div>' : "") : "") +
-    (c.price != null && c.qty > 1 ? '<div style="font-size:.68rem;color:#94a3b8">total US ' + fmtPrice(c.price * c.qty) + '</div>' : "") +
+    (c.priceFR != null ? '<div style="font-weight:700;color:#059669">' + c.priceFR.toFixed(2) + ' €</div>' : "") +
+    (c.price != null && c.qty > 1 ? '<div style="font-size:.68rem;color:#94a3b8">total ' + fmtPrice(c.price * c.qty) + '</div>' : "") +
     '<div style="margin-top:4px">' +
-    (c.cmExact
-      ? '<a class="xbtn" style="display:inline-block;text-decoration:none" href="' + esc(c.cmExact) + '" target="_blank" rel="noopener" title="Ouvrir la fiche Cardmarket exacte">🔗🇫🇷</a>'
-      : '<button class="xbtn" onclick="promptCmLink(\'' + esc(k) + '\')" title="Coller le lien Cardmarket exact de cette carte">🔗</button>') +
-    (c.cmExact ? '<button class="xbtn" onclick="fetchCMByKey(\'' + esc(k) + '\')" ' + (ui.busyFR && ui.busyFR.has(k) ? "disabled" : "") + ' title="Tenter la récupération automatique de la cote FR">' + (ui.busyFR && ui.busyFR.has(k) ? "…" : "⤓") + '</button>' +
-      '<button class="xbtn" onclick="promptFRPrice(\'' + esc(k) + '\')" title="Saisir / coller la cote FR (€)">✎</button>' : "") +
-    '<button class="xbtn" onclick="refreshCardByKey(\'' + esc(k) + '\')" ' + (ui.busyKeys.has(k) ? "disabled" : "") + ' title="Rafraîchir la cote US">' + (ui.busyKeys.has(k) ? "…" : "🔄") + '</button>' +
+    '<button class="xbtn" onclick="promptCmLink(\'' + esc(k) + '\')" title="Coller le lien Cardmarket exact">🔗</button>' +
+    (c.cmExact ? '<button class="xbtn" onclick="promptFRPrice(\'' + esc(k) + '\')" title="Saisir / coller la cote FR (€)">✎</button>' : "") +
+    '<button class="xbtn" onclick="refreshCardByKey(\'' + esc(k) + '\')" ' + (ui.busyKeys.has(k) ? "disabled" : "") + ' title="Rafraîchir la cote US via Pokétrace">' + (ui.busyKeys.has(k) ? "…" : "🔄") + '</button>' +
     '<button class="xbtn del" onclick="removeCard(\'' + esc(k) + '\')" title="Supprimer">✕</button></div></div></div>';
 }
 
-// Écoute des filtres (on synchronise l'état puis on re-render)
+// Écoute des filtres
 document.getElementById("main").addEventListener("input", (ev) => {
   if (ev.target.id === "filterText") { ui.filterText = ev.target.value; render(); }
 });
@@ -1142,6 +1104,7 @@ document.getElementById("main").addEventListener("change", (ev) => {
 });
 
 render();
+if (apiKey) loadQuota();
 </script>
 </body>
 </html>
