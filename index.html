@@ -5,60 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ma Collection Pokémon v3</title>
 <style>
-:root{--bg:#0f1220;--card:#1a1f36;--card2:#232a4a;--txt:#eef1ff;--mut:#9aa3c7;--acc:#ffcb05;--acc2:#3b82f6;--ok:#34d399;--bad:#f87171;--bor:#2e3560;}
+:root{--bg:#0f1220;--card:#1a1f36;--card2:#232a4a;--txt:#eef1ff;--mut:#9aa3c7;--acc:#ffcb05;--ok:#34d399;--bad:#f87171;--bor:#2e3560;}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding:16px}
-h1{font-size:1.4rem;text-align:center;margin-bottom:4px}
-.sub{text-align:center;color:var(--mut);font-size:.8rem;margin-bottom:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding:14px}
+.wrap{max-width:1000px;margin:0 auto}
+h1{font-size:1.3rem;text-align:center;margin-bottom:4px}
+.sub{text-align:center;color:var(--mut);font-size:.75rem;margin-bottom:14px}
 .panel{background:var(--card);border:1px solid var(--bor);border-radius:12px;padding:14px;margin-bottom:14px}
-label{font-size:.75rem;color:var(--mut);display:block;margin-bottom:4px}
-input,select,button{font-family:inherit;font-size:.95rem;border-radius:8px;border:1px solid var(--bor);background:var(--card2);color:var(--txt);padding:8px 10px}
+label{font-size:.72rem;color:var(--mut);display:block;margin-bottom:4px}
+input,select,button{font-family:inherit;font-size:.95rem;border-radius:8px;border:1px solid var(--bor);background:var(--card2);color:var(--txt);padding:9px 10px}
 input,select{width:100%}
 button{cursor:pointer;font-weight:600;transition:filter .15s}
 button:hover{filter:brightness(1.15)}
 button:disabled{opacity:.5;cursor:not-allowed}
 .btn-acc{background:var(--acc);color:#1a1a1a;border:none}
 .btn-sec{background:var(--card2)}
-.btn-mini{padding:4px 8px;font-size:.8rem}
+.btn-mini{padding:5px 9px;font-size:.82rem;border-radius:7px}
 .searchrow{display:flex;gap:8px}
-.searchrow input{flex:1}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:12px}
-.rescard{background:var(--card2);border:1px solid var(--bor);border-radius:10px;padding:8px;text-align:center;cursor:pointer;transition:transform .1s,border-color .1s}
+.searchrow input{flex:1;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:10px;margin-top:12px}
+.rescard{background:var(--card2);border:1px solid var(--bor);border-radius:10px;padding:7px;text-align:center;cursor:pointer;transition:transform .1s,border-color .1s}
 .rescard:hover{transform:translateY(-2px);border-color:var(--acc)}
-.rescard img{width:100%;border-radius:6px;background:#000}
-.rescard .n{font-size:.8rem;font-weight:700;margin-top:6px;line-height:1.2}
-.rescard .s{font-size:.68rem;color:var(--mut);margin-top:2px}
+.rescard .imw{display:block;width:100%;aspect-ratio:5/7;border-radius:6px;background:linear-gradient(135deg,#232a4a,#151a30);overflow:hidden}
+.rescard img{width:100%;height:100%;object-fit:contain;display:block}
+.rescard .n{font-size:.78rem;font-weight:700;margin-top:6px;line-height:1.2}
+.rescard .s{font-size:.66rem;color:var(--mut);margin-top:2px}
+.noimg{display:flex;align-items:center;justify-content:center;height:100%;color:var(--mut);font-size:1.6rem}
 .tbl{width:100%;border-collapse:collapse;font-size:.82rem}
-.tbl th{position:sticky;top:0;background:var(--card2);color:var(--mut);text-align:left;padding:8px 6px;font-size:.72rem;text-transform:uppercase;cursor:pointer;white-space:nowrap}
-.tbl td{padding:8px 6px;border-top:1px solid var(--bor);vertical-align:middle}
-.tbl img.ph{width:44px;height:44px;object-fit:cover;border-radius:6px;display:block}
-.thumb{width:40px;border-radius:5px;display:block}
-.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.68rem;font-weight:700;background:var(--card2);border:1px solid var(--bor)}
+.stats{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:.8rem}
+.stats b{color:var(--acc)}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.66rem;font-weight:700;background:var(--card2);border:1px solid var(--bor);white-space:nowrap}
 .badge.holo{background:#312e81;border-color:#6366f1}
 .badge.rh{background:#065f46;border-color:#34d399}
 .price{font-weight:800;color:var(--ok);white-space:nowrap}
-.mut{color:var(--mut);font-size:.7rem}
-.stats{display:flex;flex-wrap:wrap;gap:10px;font-size:.8rem}
-.stats b{color:var(--acc)}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:50;padding:12px}
+.mut{color:var(--mut);font-size:.68rem}
+/* éléments de collection */
+.item{display:flex;gap:10px;align-items:center;background:var(--card2);border:1px solid var(--bor);border-radius:12px;padding:10px;margin-top:10px}
+.item .imw{flex:0 0 58px;width:58px;height:81px;border-radius:6px;overflow:hidden;background:#10142a}
+.item .imw img{width:100%;height:100%;object-fit:contain;display:block}
+.item .mid{flex:1;min-width:0}
+.item .mid .nm{font-weight:800;font-size:.9rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .mid .st{font-size:.72rem;color:var(--mut);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .fin{margin-top:5px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.item .right{text-align:right;flex:0 0 auto}
+.item .right .p{font-size:.95rem}
+.item .right .tot{font-size:.72rem;color:var(--mut);margin-top:2px}
+.item .acts{display:flex;gap:5px;margin-top:7px;justify-content:flex-end;flex-wrap:wrap}
+.phbtn{width:34px;height:34px;border-radius:8px;overflow:hidden;padding:0;flex:0 0 auto}
+.phbtn img{width:100%;height:100%;object-fit:cover;display:block}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:50;padding:12px}
 .modal-bg.on{display:flex}
 .modal{background:var(--card);border:1px solid var(--bor);border-radius:14px;max-width:560px;width:100%;max-height:92vh;overflow:auto;padding:16px}
-.modal h3{margin-bottom:8px;font-size:1.05rem}
+.modal h3{margin-bottom:10px;font-size:1.05rem}
 .mgrid{display:flex;gap:14px;flex-wrap:wrap}
-.mgrid img{width:170px;border-radius:10px;background:#000}
-.mfields{flex:1;min-width:180px;display:flex;flex-direction:column;gap:10px}
-.rowactions{white-space:nowrap;text-align:right}
+.mgrid .big{width:168px;height:235px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,#232a4a,#151a30);flex:0 0 auto}
+.mgrid .big img{width:100%;height:100%;object-fit:contain}
+.mfields{flex:1;min-width:170px;display:flex;flex-direction:column;gap:10px}
+.mfields .val{font-size:.9rem}
 .status{font-size:.72rem;margin-top:6px;color:var(--mut)}
 .status.err{color:var(--bad)}
 .status.ok{color:var(--ok)}
 .filters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-@media(max-width:640px){.filters{grid-template-columns:1fr}.tbl{font-size:.75rem}}
-.empty{text-align:center;color:var(--mut);padding:24px;font-size:.85rem}
-.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--acc);padding:10px 18px;border-radius:10px;font-size:.85rem;display:none;z-index:99}
+@media(max-width:640px){.filters{grid-template-columns:1fr 1fr}.filters > div:first-child{grid-column:1/-1}}
+.toolbar{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.empty{text-align:center;color:var(--mut);padding:22px;font-size:.85rem}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--acc);padding:10px 18px;border-radius:10px;font-size:.85rem;display:none;z-index:99;max-width:90vw}
 .toast.on{display:block}
 </style>
 </head>
 <body>
+<div class="wrap">
 <h1>⚡ Ma Collection Pokémon — v3</h1>
 <div class="sub">Base FR : TCGdex · Cotes € : Pokemon TCG API (CardMarket)</div>
 
@@ -73,7 +89,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 <div class="panel">
   <div class="stats" id="stats"></div>
-  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+  <div class="toolbar">
     <button class="btn-sec btn-mini" id="btnRefreshAll">🔄 Rafraîchir toutes les cotes</button>
     <button class="btn-sec btn-mini" id="btnCsv">📄 Export CSV</button>
   </div>
@@ -85,10 +101,9 @@ button:disabled{opacity:.5;cursor:not-allowed}
 </div>
 
 <div class="panel">
-  <table class="tbl"><thead><tr>
-    <th>Photo</th><th data-s="name">Carte</th><th data-s="set">Édition</th><th>#</th><th data-s="finish">Finition</th><th>Qté</th><th data-s="price">Cote €</th><th>Total €</th><th>Maj</th><th></th>
-  </tr></thead><tbody id="tbody"></tbody></table>
+  <div id="collList"></div>
   <div id="collEmpty" class="empty">Collection vide — recherche une carte pour commencer.</div>
+</div>
 </div>
 
 <div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
@@ -99,14 +114,9 @@ button:disabled{opacity:.5;cursor:not-allowed}
 const LS_KEY = "pkmn-collection-v3";
 const TCGDEX = "https://api.tcgdex.net/v2/fr";
 const PTCG = "https://api.pokemontcg.io/v2/cards";
-const detailCache = new Map(); // tcgdex id -> detail JSON
+const detailCache = new Map();
 
-let ui = {
-  results: [], resultsLoading: false,
-  coll: [], // {id,name,setName,rarity,number,image,finish,qty,price,priceDate,source,photo}
-  filters: { q: "", finish: "", sort: "name" },
-  busy: false
-};
+let ui = { results: [], coll: [], filters: { q: "", finish: "", sort: "name" }, busy: false };
 
 const $ = id => document.getElementById(id);
 function toast(msg, err) {
@@ -115,12 +125,45 @@ function toast(msg, err) {
   t.classList.add("on"); setTimeout(() => t.classList.remove("on"), 2600);
 }
 function status(id, msg, cls) { const el = $(id); el.textContent = msg || ""; el.className = "status" + (cls ? " " + cls : ""); }
-function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
-function fmtDate(iso) { if (!iso) return "—"; try { return new Date(iso).toLocaleDateString("fr-FR"); } catch { return "—"; } }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+function fmtDate(iso) { if (!iso) return "—"; try { return new Date(iso).toLocaleDateString("fr-FR"); } catch (e) { return "—"; } }
 function eur(n) { return (n == null) ? "—" : n.toLocaleString("fr-FR", { style: "currency", currency: "EUR" }); }
-function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(ui.coll)); } catch(e) { toast("Stockage plein (photos ?)", true); } }
-function load() { try { const raw = localStorage.getItem(LS_KEY); if (raw) ui.coll = JSON.parse(raw) || []; } catch {} }
-function imgUrl(base) { return (base || "") + ".png"; }
+function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(ui.coll)); } catch (e) { toast("Stockage plein (photos ?)", true); } }
+function load() { try { const raw = localStorage.getItem(LS_KEY); if (raw) ui.coll = JSON.parse(raw) || []; } catch (e) {} }
+
+// ---------- Identifiants / images ----------
+// set TCGdex -> set Pokemon TCG (sv04 -> sv4, sv04.5 -> sv4pt5)
+function normSet(set) {
+  return set.replace(/^sv0(\d)$/, "sv$1").replace(/^sv0(\d)\.5$/, "sv$1pt5");
+}
+// candidates d'id pour Pokemon TCG API, du plus probable au moins probable
+function ptcgCandidates(id) {
+  const m = id.match(/^([^-]+)-(.+)$/); if (!m) return [id];
+  const set = m[1], num = m[2];
+  const numBase = num.replace(/[a-z]$/i, "");            // xy4-65a -> 65
+  const numPad = numBase.replace(/^0+(\d)/, "$1");       // 051 -> 51
+  const ns = normSet(set);
+  const out = [];
+  [set + "-" + num, ns + "-" + num, ns + "-" + numBase, ns + "-" + numPad, set + "-" + numPad, set + "-" + numBase]
+    .forEach(c => { if (c !== id || out.length === 0) if (out.indexOf(c) < 0) out.push(c); });
+  return out.slice(0, 6);
+}
+// image de secours Pokemon TCG (images.pokemontcg.io) si le numéro est numérique
+function ptcgImgUrl(id) {
+  const m = id.match(/^([^-]+)-(.+)$/); if (!m) return null;
+  const numPad = m[2].replace(/[a-z]$/i, "").replace(/^0+(\d)/, "$1");
+  if (!/^\d+$/.test(numPad)) return null;
+  return "https://images.pokemontcg.io/" + normSet(m[1]) + "/" + numPad + ".png";
+}
+// <img> avec chaîne de secours : TCGdex FR -> Pokemon TCG -> masquée
+function cardImgHtml(base, id) {
+  const main = base ? esc(base + ".png") : "";
+  const fb = ptcgImgUrl(id);
+  if (!main && !fb) return '<div class="noimg">🃏</div>';
+  const onerr = "var u=this.dataset.f;this.dataset.f='';if(u){this.src=u;return;}this.parentNode.innerHTML='<div class=noimg>&#129345;</div>'";
+  const src = main || fb, dataFb = (main && fb) ? ' data-f="' + esc(fb) + '"' : "";
+  return '<img loading="lazy" src="' + src + '"' + dataFb + ' onerror="' + esc(onerr) + '" alt="">';
+}
 
 // ---------- API ----------
 async function jfetch(url) {
@@ -128,7 +171,6 @@ async function jfetch(url) {
   if (!r.ok) throw new Error("HTTP " + r.status);
   return r.json();
 }
-
 async function searchCards(name) {
   status("searchStatus", "Recherche en cours…");
   $("results").innerHTML = "";
@@ -141,36 +183,46 @@ async function searchCards(name) {
   }
   renderResults();
 }
-
 async function getDetail(id) {
   if (detailCache.has(id)) return detailCache.get(id);
   const d = await jfetch(TCGDEX + "/cards/" + encodeURIComponent(id));
   detailCache.set(id, d); return d;
 }
 
-// Cote EUR via Pokemon TCG API (CardMarket prices), fallback TCGdex pricing
+// cote EUR : Pokemon TCG API (CardMarket), fallback TCGdex pricing
 async function getPrice(tcgdexId, finish) {
-  // 1) essais Pokemon TCG API : id tel quel, puis sans suffixe lettre
-  let ptcgId = tcgdexId, data = null;
-  for (const attempt of [tcgdexId, tcgdexId.replace(/[a-z]$/, "")]) {
-    if (!attempt) continue;
-    try { const res = await jfetch(PTCG + "/" + encodeURIComponent(attempt)); data = res && res.data; ptcgId = attempt; if (data && data.cardmarket) break; } catch (e) {}
+  let detail = null;
+  try { detail = await getDetail(tcgdexId); } catch (e) {}
+  const v = (detail && detail.variants) || {};
+  const hasNormal = v.normal !== false;
+  const hasReverse = v.reverse !== false;
+  const hasHolo = v.holo !== false;
+
+  for (const cid of ptcgCandidates(tcgdexId)) {
+    try {
+      const res = await jfetch(PTCG + "/" + encodeURIComponent(cid));
+      const pr = res && res.data && res.data.cardmarket && res.data.cardmarket.prices;
+      if (!pr) continue;
+      let val = null;
+      if (finish === "Normale") val = pr.trendPrice != null ? pr.trendPrice : pr.averageSellPrice;
+      else if (finish === "Reverse Holo") {
+        val = pr.reverseHoloTrend != null ? pr.reverseHoloTrend : pr.reverseHoloSell;
+        if ((val == null || val <= 0) && !hasReverse && hasHolo) val = pr.trendPrice;
+      } else { // Holo
+        if (hasNormal) val = pr.reverseHoloTrend != null ? pr.reverseHoloTrend : pr.trendPrice;
+        else val = pr.trendPrice != null ? pr.trendPrice : pr.reverseHoloTrend;
+      }
+      if (val != null && val > 0) return { price: val, source: "CardMarket (via Pokémon TCG API)" };
+    } catch (e) {}
   }
-  const pr = data && data.cardmarket && data.cardmarket.prices ? data.cardmarket.prices : null;
-  if (pr) {
-    if (finish === "Reverse Holo" && pr.reverseHoloTrend != null) return { price: pr.reverseHoloTrend, source: "CardMarket (via Pokémon TCG API)" };
-    if (finish === "Holo" && pr.holoTrend != null) return { price: pr.holoTrend, source: "CardMarket (via Pokémon TCG API)" };
-    if (finish !== "Reverse Holo" && pr.trendPrice != null) return { price: pr.trendPrice, source: "CardMarket (via Pokémon TCG API)" };
+  // fallback : pricing TCGdex (aussi CardMarket EUR) — ignorer les 0
+  const cm = detail && detail.pricing && detail.pricing.cardmarket;
+  if (cm) {
+    let val = null;
+    if (finish === "Normale") val = cm.trend;
+    else val = (cm["trend-holo"] != null && cm["trend-holo"] > 0) ? cm["trend-holo"] : cm.trend;
+    if (val != null && val > 0) return { price: val, source: "CardMarket (via TCGdex)" };
   }
-  // 2) fallback : pricing TCGdex (aussi CardMarket EUR)
-  try {
-    const d = await getDetail(tcgdexId);
-    const cm = d && d.pricing && d.pricing.cardmarket;
-    if (cm) {
-      const v = (finish === "Normale") ? cm.trend : (cm["trend-holo"] != null ? cm["trend-holo"] : cm.trend);
-      if (v != null) return { price: v, source: "CardMarket (via TCGdex)" };
-    }
-  } catch (e) {}
   return { price: null, source: "Non cotée" };
 }
 
@@ -179,8 +231,8 @@ function renderResults() {
   const g = $("results");
   if (!ui.results.length) { g.innerHTML = ""; return; }
   g.innerHTML = ui.results.map((c, i) =>
-    '<div class="rescard" data-i="' + i + '"><img loading="lazy" src="' + esc(imgUrl(c.image)) + '" alt="">' +
-    '<div class="n">' + esc(c.name) + '</div><div class="s">#' + esc(c.localId) + "</div></div>"
+    '<div class="rescard" data-i="' + i + '"><span class="imw">' + cardImgHtml(c.image, c.id) + '</span>' +
+    '<div class="n">' + esc(c.name) + '</div><div class="s">#' + esc(c.localId) + '</div></div>'
   ).join("");
   g.querySelectorAll(".rescard").forEach(el => el.onclick = () => openModal(ui.results[+el.dataset.i]));
 }
@@ -188,10 +240,12 @@ function renderResults() {
 // ---------- Modale ajout ----------
 function finishesFor(detail) {
   const v = (detail && detail.variants) || {};
-  const out = ["Normale"];
-  if (v.reverse !== false) out.push("Reverse Holo");
+  if (!detail || !detail.variants) return ["Normale", "Holo", "Reverse Holo"];
+  const out = [];
+  if (v.normal !== false) out.push("Normale");
   if (v.holo !== false) out.push("Holo");
-  return out;
+  if (v.reverse !== false) out.push("Reverse Holo");
+  return out.length ? out : ["Normale"];
 }
 
 async function openModal(min) {
@@ -203,12 +257,13 @@ async function openModal(min) {
   try { d = await getDetail(min.id); }
   catch (e) { box.innerHTML = '<div class="empty">Impossible de charger la carte.<br>' + esc(e.message) + '</div>'; return; }
   const fin = finishesFor(d);
+  const count = d.set && d.set.cardCount && d.set.cardCount.official || "?";
   box.innerHTML =
     '<h3>' + esc(d.name) + '</h3>' +
-    '<div class="mgrid"><img src="' + esc(imgUrl(d.image)) + '" alt="">' +
+    '<div class="mgrid"><span class="big">' + cardImgHtml(d.image, d.id) + '</span>' +
     '<div class="mfields">' +
-      '<div><label>Édition</label><div>' + esc(d.set && d.set.name || "—") + ' · ' + esc(d.rarity || "") + '</div></div>' +
-      '<div><label>Numéro</label><div>#' + esc(d.localId) + ' / ' + esc(d.set && d.set.cardCount && d.set.cardCount.official || "?") + '</div></div>' +
+      '<div><label>Édition</label><div class="val">' + esc((d.set && d.set.name) || "—") + ' · ' + esc(d.rarity || "") + '</div></div>' +
+      '<div><label>Numéro</label><div class="val">#' + esc(d.localId) + ' / ' + count + '</div></div>' +
       '<div><label>Finition</label><select id="mFin">' + fin.map(f => '<option>' + f + '</option>').join("") + '</select></div>' +
       '<div><label>Quantité</label><input id="mQty" type="number" min="1" value="1"></div>' +
       '<button class="btn-acc" id="mAdd">Ajouter + récupérer la cote</button>' +
@@ -216,17 +271,18 @@ async function openModal(min) {
     '</div></div>';
   $("mAdd").onclick = async () => {
     const btn = $("mAdd"); btn.disabled = true; btn.textContent = "Récupération de la cote…";
-    const finish = $("mFin").value, qty = Math.max(1, parseInt($("mQty").value) || 1);
-    const { price, source } = await getPrice(min.id, finish);
+    const finish = $("mFin").value, qty = Math.max(1, parseInt($("mQty").value, 10) || 1);
+    const p = await getPrice(min.id, finish);
     ui.coll.push({
-      id: min.id, name: d.name, setName: d.set && d.set.name || "",
+      id: min.id, name: d.name, setName: (d.set && d.set.name) || "",
       rarity: d.rarity || "", number: d.localId, image: d.image,
-      finish, qty, price, priceDate: price != null ? new Date().toISOString() : null,
-      source, added: Date.now(), photo: null
+      finish, qty, price: p.price, source: p.source,
+      priceDate: p.price != null ? new Date().toISOString() : null,
+      added: Date.now(), photo: null
     });
     save(); render();
     bg.classList.remove("on");
-    toast(price != null ? ("Ajouté : " + eur(price)) : "Ajouté (cote indisponible)", price == null);
+    toast(p.price != null ? ("Ajouté : " + eur(p.price)) : "Ajouté (cote indisponible)", p.price == null);
   };
 }
 
@@ -234,46 +290,54 @@ async function openModal(min) {
 function visible() {
   const { q, finish, sort } = ui.filters;
   const ql = q.trim().toLowerCase();
-  let list = ui.coll.filter(c =>
+  const list = ui.coll.filter(c =>
     (!ql || (c.name + " " + c.setName).toLowerCase().includes(ql)) &&
     (!finish || c.finish === finish)
   );
   const cmp = {
-    name: (a,b) => a.name.localeCompare(b.name, "fr") || a.number.localeCompare(b.number, "fr", {numeric:true}),
-    set:  (a,b) => (a.setName||"").localeCompare(b.setName||"", "fr") || a.name.localeCompare(b.name, "fr"),
-    price:(a,b) => (b.price||0)-(a.price||0),
-    added:(a,b) => b.added-a.added
+    name: (a, b) => a.name.localeCompare(b.name, "fr") || (a.number || "").localeCompare(b.number || "fr", "fr", { numeric: true }),
+    set: (a, b) => (a.setName || "").localeCompare(b.setName || "", "fr") || a.name.localeCompare(b.name, "fr"),
+    price: (a, b) => (b.price || 0) - (a.price || 0),
+    added: (a, b) => b.added - a.added
   }[sort];
   return list.sort(cmp);
 }
 
 function render() {
-  const list = visible(), tb = $("tbody");
+  const list = visible();
   $("collEmpty").style.display = ui.coll.length ? "none" : "block";
-  const cards = ui.coll.reduce((s,c) => s + c.qty, 0);
-  const val = ui.coll.reduce((s,c) => s + (c.price||0) * c.qty, 0);
+  const cards = ui.coll.reduce((s, c) => s + c.qty, 0);
+  const val = ui.coll.reduce((s, c) => s + (c.price || 0) * c.qty, 0);
   const sets = new Set(ui.coll.map(c => c.setName)).size;
-  $("stats").innerHTML = "<span>CARTES : <b>" + cards + "</b></span><span>RÉFÉRENCES : <b>" + ui.coll.length + "</b></span><span>ÉDITIONS : <b>" + sets + "</b></span><span>VALEUR : <b>" + eur(val) + "</b></span>";
-  tb.innerHTML = list.map((c) => {
-    const idx = ui.coll.indexOf(c);
+  $("stats").innerHTML =
+    "<span>CARTES : <b>" + cards + "</b></span><span>RÉFÉRENCES : <b>" + ui.coll.length +
+    "</b></span><span>ÉDITIONS : <b>" + sets + "</b></span><span>VALEUR : <b>" + eur(val) + "</b></span>";
+
+  $("collList").innerHTML = list.map(c => {
+    const i = ui.coll.indexOf(c);
     const cls = c.finish === "Reverse Holo" ? "rh" : (c.finish === "Holo" ? "holo" : "");
-    return '<tr>' +
-      '<td>' + (c.photo ? '<img class="ph" src="' + c.photo + '">' : '<button class="btn-sec btn-mini" data-act="photo" data-i="' + idx + '">📷</button>') + '</td>' +
-      '<td><div style="display:flex;gap:8px;align-items:center"><img class="thumb" loading="lazy" src="' + esc(imgUrl(c.image)) + '"><b>' + esc(c.name) + '</b></div></td>' +
-      '<td>' + esc(c.setName) + '</td><td>#' + esc(c.number) + '</td>' +
-      '<td><span class="badge ' + cls + '">' + esc(c.finish) + '</span></td>' +
-      '<td>' + c.qty + '</td>' +
-      '<td class="price">' + eur(c.price) + '</td>' +
-      '<td class="price">' + eur((c.price||0)*c.qty) + '</td>' +
-      '<td class="mut">' + fmtDate(c.priceDate) + '</td>' +
-      '<td class="rowactions">' +
-        '<button class="btn-sec btn-mini" data-act="refresh" data-i="' + idx + '" title="Rafraîchir la cote">🔄</button> ' +
-        '<button class="btn-sec btn-mini" data-act="minus" data-i="' + idx + '">−</button>' +
-        '<button class="btn-sec btn-mini" data-act="plus" data-i="' + idx + '">+</button> ' +
-        '<button class="btn-sec btn-mini" data-act="del" data-i="' + idx + '">🗑</button>' +
-      '</td></tr>';
+    return '<div class="item">' +
+      '<span class="imw">' + cardImgHtml(c.image, c.id) + '</span>' +
+      '<div class="mid">' +
+        '<div class="nm">' + esc(c.name) + '</div>' +
+        '<div class="st">' + esc(c.setName) + ' · #' + esc(c.number) + (c.rarity ? ' · ' + esc(c.rarity) : '') + '</div>' +
+        '<div class="fin"><span class="badge ' + cls + '">' + esc(c.finish) + '</span> <span class="mut">Maj ' + fmtDate(c.priceDate) + '</span></div>' +
+      '</div>' +
+      '<button class="btn-sec phbtn" data-act="photo" data-i="' + i + '" title="Photo perso">' +
+        (c.photo ? '<img src="' + c.photo + '" alt="">' : '📷') + '</button>' +
+      '<div class="right">' +
+        '<div class="price p">' + eur(c.price) + '</div>' +
+        '<div class="tot">' + c.qty + ' × → <span class="price">' + eur((c.price || 0) * c.qty) + '</span></div>' +
+        '<div class="acts">' +
+          '<button class="btn-sec btn-mini" data-act="refresh" data-i="' + i + '">🔄</button>' +
+          '<button class="btn-sec btn-mini" data-act="minus" data-i="' + i + '">−</button>' +
+          '<button class="btn-sec btn-mini" data-act="plus" data-i="' + i + '">+</button>' +
+          '<button class="btn-sec btn-mini" data-act="del" data-i="' + i + '">🗑</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
   }).join("");
-  tb.querySelectorAll("button[data-act]").forEach(btn => btn.onclick = () => rowAction(btn.dataset.act, +btn.dataset.i));
+  $("collList").querySelectorAll("button[data-act]").forEach(btn => btn.onclick = () => rowAction(btn.dataset.act, +btn.dataset.i));
 }
 
 async function rowAction(act, i) {
@@ -281,7 +345,14 @@ async function rowAction(act, i) {
   if (act === "del") { ui.coll.splice(i, 1); save(); render(); }
   else if (act === "plus") { c.qty++; save(); render(); }
   else if (act === "minus") { if (--c.qty < 1) ui.coll.splice(i, 1); save(); render(); }
-  else if (act === "refresh") { toast("Cote en cours…"); const p = await getPrice(c.id, c.finish); c.price = p.price; c.source = p.source; c.priceDate = p.price != null ? new Date().toISOString() : null; save(); render(); toast(p.price != null ? ("Cote : " + eur(p.price)) : "Cote indisponible", p.price == null); }
+  else if (act === "refresh") {
+    toast("Cote en cours…");
+    const p = await getPrice(c.id, c.finish);
+    c.price = p.price; c.source = p.source;
+    c.priceDate = p.price != null ? new Date().toISOString() : null;
+    save(); render();
+    toast(p.price != null ? ("Cote : " + eur(p.price)) : "Cote indisponible", p.price == null);
+  }
   else if (act === "photo") attachPhoto(i);
 }
 
@@ -293,7 +364,7 @@ function attachPhoto(i) {
     img.onload = () => {
       const cv = document.createElement("canvas");
       const s = Math.min(1, 300 / Math.max(img.width, img.height));
-      cv.width = img.width * s; cv.height = img.height * s;
+      cv.width = Math.max(1, Math.round(img.width * s)); cv.height = Math.max(1, Math.round(img.height * s));
       cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
       ui.coll[i].photo = cv.toDataURL("image/jpeg", 0.7);
       URL.revokeObjectURL(img.src); save(); render();
@@ -322,9 +393,9 @@ async function refreshAll() {
 }
 
 function exportCsv() {
-  const head = ["Nom FR","Édition FR","Numéro","Rareté","Finition","Qté","Cote €","Total €","Source","Maj","ID"];
-  const rows = ui.coll.map(c => [c.name, c.setName, c.number, c.rarity, c.finish, c.qty, c.price ?? "", ((c.price)||0)*c.qty, c.source, fmtDate(c.priceDate), c.id]);
-  const csv = [head, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(";")).join("\r\n");
+  const head = ["Nom FR", "Édition FR", "Numéro", "Rareté", "Finition", "Qté", "Cote €", "Total €", "Source", "Maj", "ID"];
+  const rows = ui.coll.map(c => [c.name, c.setName, c.number, c.rarity, c.finish, c.qty, c.price == null ? "" : c.price, (c.price || 0) * c.qty, c.source, fmtDate(c.priceDate), c.id]);
+  const csv = [head].concat(rows).map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(";")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" }));
   a.download = "collection-pokemon-v3.csv"; a.click(); URL.revokeObjectURL(a.href);
