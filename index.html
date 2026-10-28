@@ -79,7 +79,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <body>
 <div class="wrap">
 <h1>⚡ Ma Collection Pokémon — v3</h1>
-<div class="sub">Base FR : TCGdex · Cotes € : Pokemon TCG API (CardMarket) · <b id="ver">v3.1</b></div>
+<div class="sub">Base FR : TCGdex · Cotes € : Pokemon TCG API (CardMarket) · <b id="ver">v3.2</b></div>
 
 <div class="panel">
   <div class="searchrow">
@@ -97,6 +97,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <button class="btn-sec btn-mini" id="btnCsv">📄 Export CSV</button>
     <button class="btn-sec btn-mini" id="btnImport">📥 Import CSV</button>
   </div>
+  <div id="importStatus" class="status">Import : sélectionne un fichier CSV exporté depuis l'app (il remplacera toute la collection, après confirmation).</div>
   <div style="margin-top:10px" class="filters">
     <div><label>Filtrer (nom, édition)</label><input id="fSearch" placeholder="Filtre…"></div>
     <div><label>Finition</label><select id="fFinish"><option value="">Toutes</option><option>Normale</option><option>Holo</option><option>Reverse Holo</option></select></div>
@@ -463,31 +464,32 @@ function csvDateToIso(s) {
   const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(s || "").trim());
   return m ? m[3] + "-" + m[2] + "-" + m[1] + "T00:00:00" : (s ? new Date(s).toISOString() : null);
 }
-function importCsv() {
-  const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".csv,text/csv,text/plain";
-  inp.onchange = async () => {
-    const f = inp.files && inp.files[0];
-    if (!f) { toast("Aucun fichier sélectionné", true); return; }
-    try {
-      // lecture (f.text() moderne, sinon FileReader)
-      let text = "";
-      if (f.text) text = await f.text();
-      else text = await new Promise((res, rej) => {
-        const rd = new FileReader();
-        rd.onload = () => res(String(rd.result));
-        rd.onerror = () => rej(new Error("lecture impossible"));
-        rd.readAsText(f, "utf-8");
-      });
-      if (!text || !text.trim()) { toast("Le fichier est vide", true); return; }
-      const { rows, delim } = parseCsvSmart(text);
-      const clean = rows.filter(r => r.some(v => v.trim() !== ""));
-      if (clean.length < 2) { toast("CSV illisible ou sans données", true); return; }
-      const idx = {}; clean[0].forEach((h, i) => idx[h.trim()] = i);
-      if (idx["Nom FR"] == null || idx["ID"] == null) {
-        toast("En-têtes invalides — colonnes « Nom FR » et « ID » requises", true); return;
-      }
-      toast("Fichier lu : " + (clean.length - 1) + " ligne(s), séparateur « " + (delim === "\t" ? "tab" : delim) + " »");
-      const get = (r, k) => idx[k] != null ? String(r[idx[k]] || "").trim() : "";
+// traitement du fichier choisi
+async function processImportFile(f) {
+  const st = $("importStatus");
+  try {
+    st.className = "status"; st.textContent = "Import : lecture de « " + f.name + " »…";
+    // lecture (f.text() moderne, sinon FileReader)
+    let text = "";
+    if (f.text) text = await f.text();
+    else text = await new Promise((res, rej) => {
+      const rd = new FileReader();
+      rd.onload = () => res(String(rd.result));
+      rd.onerror = () => rej(new Error("lecture impossible"));
+      rd.readAsText(f, "utf-8");
+    });
+    if (!text || !text.trim()) { st.className = "status err"; st.textContent = "Import : le fichier est vide."; return; }
+    const { rows, delim } = parseCsvSmart(text);
+    const clean = rows.filter(r => r.some(v => v.trim() !== ""));
+    if (clean.length < 2) { st.className = "status err"; st.textContent = "Import : CSV illisible ou sans données."; return; }
+    const idx = {}; clean[0].forEach((h, i) => idx[h.trim()] = i);
+    if (idx["Nom FR"] == null || idx["ID"] == null) {
+      st.className = "status err";
+      st.textContent = "Import : en-têtes invalides — colonnes « Nom FR » et « ID » requises.";
+      return;
+    }
+    st.textContent = "Import : " + (clean.length - 1) + " ligne(s) lues, séparateur « " + (delim === "\t" ? "tab" : delim) + " » — confirmation requise.";
+    const get = (r, k) => idx[k] != null ? String(r[idx[k]] || "").trim() : "";
       // ATTENTION : écrasement total (confirmation intégrée, pas de confirm() natif)
       askConfirm(
         "⚠️ Import CSV",
@@ -513,14 +515,28 @@ function importCsv() {
             });
           }
           ui.coll = items; save(); render();
-          toast("Importé : " + items.length + " carte(s)" + (skipped ? " (" + skipped + " ligne(s) ignorée(s))" : ""));
+          st.className = "status ok";
+          st.textContent = "Import réussi : " + items.length + " carte(s)" + (skipped ? " (" + skipped + " ligne(s) ignorée(s))" : "") + " — images en cours de récupération.";
+          toast("Importé : " + items.length + " carte(s)");
           enrichImages();
         }
       );
-    } catch (e) { toast("Erreur d'import : " + ((e && e.message) || e), true); }
-  };
-  inp.click();
+  } catch (e) {
+    st.className = "status err";
+    st.textContent = "Import : erreur — " + ((e && e.message) || e);
+  }
 }
+// input fichier permanent, attaché au DOM (indispensable en app iOS "écran d'accueil")
+const importInput = document.createElement("input");
+importInput.type = "file";
+importInput.accept = ".csv,text/csv,text/plain";
+importInput.style.display = "none";
+document.body.appendChild(importInput);
+importInput.addEventListener("change", () => {
+  const f = importInput.files && importInput.files[0];
+  if (f) processImportFile(f);
+  importInput.value = "";
+});
 // complète les images manquantes (après import) depuis TCGdex, en arrière-plan
 async function enrichImages() {
   const todo = ui.coll.filter(c => !c.image);
@@ -541,7 +557,7 @@ $("fOwner").onchange = e => { ui.filters.owner = e.target.value; render(); };
 $("fSort").onchange = e => { ui.filters.sort = e.target.value; render(); };
 $("btnRefreshAll").onclick = refreshAll;
 $("btnCsv").onclick = exportCsv;
-$("btnImport").onclick = importCsv;
+$("btnImport").onclick = () => { importInput.click(); };
 load(); render();
 </script>
 </body>
