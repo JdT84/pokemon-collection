@@ -95,6 +95,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   <div class="toolbar">
     <button class="btn-sec btn-mini" id="btnRefreshAll">🔄 Rafraîchir toutes les cotes</button>
     <button class="btn-sec btn-mini" id="btnCsv">📄 Export CSV</button>
+    <button class="btn-sec btn-mini" id="btnImport">📥 Import CSV</button>
   </div>
   <div style="margin-top:10px" class="filters">
     <div><label>Filtrer (nom, édition)</label><input id="fSearch" placeholder="Filtre…"></div>
@@ -410,6 +411,83 @@ function exportCsv() {
   toast("CSV exporté");
 }
 
+// ---------- Import CSV (même format que l'export) ----------
+function parseCsv(text) {
+  // retire le BOM éventuel
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const rows = []; let cur = [], field = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else q = false; }
+      else field += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ";") { cur.push(field); field = ""; }
+    else if (ch === "\n") { cur.push(field); field = ""; rows.push(cur); cur = []; }
+    else if (ch !== "\r") field += ch;
+  }
+  if (field !== "" || cur.length) { cur.push(field); rows.push(cur); }
+  return rows;
+}
+function csvDateToIso(s) {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(s || "").trim());
+  return m ? m[3] + "-" + m[2] + "-" + m[1] + "T00:00:00" : (s ? new Date(s).toISOString() : null);
+}
+function importCsv() {
+  const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".csv,text/csv";
+  inp.onchange = () => {
+    const f = inp.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      const rows = parseCsv(String(rd.result)).filter(r => r.some(v => v.trim() !== ""));
+      if (rows.length < 2) { toast("CSV vide ou illisible", true); return; }
+      const idx = {}; rows[0].forEach((h, i) => idx[h.trim()] = i);
+      if (idx["Nom FR"] == null || idx["ID"] == null) { toast("En-têtes invalides (attendus : Nom FR, ID…)", true); return; }
+      const get = (r, k) => idx[k] != null ? String(r[idx[k]] || "").trim() : "";
+      // ATTENTION : écrasement total
+      const ok = confirm(
+        "⚠️ ATTENTION : l'import va REMPLACER TOUTE la collection actuelle\n" +
+        "(" + ui.coll.length + " référence(s) enregistrée(s)) par les " + (rows.length - 1) + " ligne(s) du fichier.\n\n" +
+        "Cette action est irréversible. Continuer ?"
+      );
+      if (!ok) { toast("Import annulé"); return; }
+      const items = [];
+      let skipped = 0;
+      for (const r of rows.slice(1)) {
+        const name = get(r, "Nom FR"), id = get(r, "ID");
+        if (!name || !id) { skipped++; continue; }
+        const price = get(r, "Cote €");
+        items.push({
+          id: id, name: name,
+          setName: get(r, "Édition FR"), number: get(r, "Numéro"),
+          rarity: get(r, "Rareté"), finish: get(r, "Finition") || "Normale",
+          owner: get(r, "Propriétaire"),
+          qty: Math.max(1, parseInt(get(r, "Qté"), 10) || 1),
+          price: price !== "" && !isNaN(parseFloat(price.replace(",", "."))) ? parseFloat(price.replace(",", ".")) : null,
+          source: get(r, "Source") || "Import CSV",
+          priceDate: get(r, "Maj") && get(r, "Maj") !== "—" ? csvDateToIso(get(r, "Maj")) : null,
+          image: null, photo: null, added: Date.now()
+        });
+      }
+      ui.coll = items; save(); render();
+      toast("Importé : " + items.length + " carte(s)" + (skipped ? " (" + skipped + " ligne(s) ignorée(s))" : ""));
+      enrichImages();
+    };
+    rd.readAsText(f, "utf-8");
+  };
+  inp.click();
+}
+// complète les images manquantes (après import) depuis TCGdex, en arrière-plan
+async function enrichImages() {
+  const todo = ui.coll.filter(c => !c.image);
+  for (let k = 0; k < todo.length; k += 4) {
+    await Promise.all(todo.slice(k, k + 4).map(async c => {
+      try { const d = await getDetail(c.id); if (d && d.image) { c.image = d.image; if (!c.setName && d.set) c.setName = d.set.name; if (!c.rarity && d.rarity) c.rarity = d.rarity; } } catch (e) {}
+    }));
+    save(); render();
+  }
+}
+
 // ---------- Init ----------
 $("btnSearch").onclick = () => { const v = $("q").value.trim(); if (v) searchCards(v); };
 $("q").addEventListener("keydown", e => { if (e.key === "Enter") $("btnSearch").click(); });
@@ -419,6 +497,7 @@ $("fOwner").onchange = e => { ui.filters.owner = e.target.value; render(); };
 $("fSort").onchange = e => { ui.filters.sort = e.target.value; render(); };
 $("btnRefreshAll").onclick = refreshAll;
 $("btnCsv").onclick = exportCsv;
+$("btnImport").onclick = importCsv;
 load(); render();
 </script>
 </body>
