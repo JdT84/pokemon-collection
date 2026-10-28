@@ -79,7 +79,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <body>
 <div class="wrap">
 <h1>⚡ Ma Collection Pokémon — v3</h1>
-<div class="sub">Base FR : TCGdex · Cotes € : Pokemon TCG API (CardMarket)</div>
+<div class="sub">Base FR : TCGdex · Cotes € : Pokemon TCG API (CardMarket) · <b id="ver">v3.1</b></div>
 
 <div class="panel">
   <div class="searchrow">
@@ -431,7 +431,7 @@ function askConfirm(title, msg, yesLabel, cb) {
 }
 
 // ---------- Import CSV (même format que l'export) ----------
-function parseCsv(text) {
+function parseCsv(text, delim) {
   // retire le BOM éventuel
   if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
   const rows = []; let cur = [], field = "", q = false;
@@ -441,37 +441,62 @@ function parseCsv(text) {
       if (ch === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else q = false; }
       else field += ch;
     } else if (ch === '"') q = true;
-    else if (ch === ";") { cur.push(field); field = ""; }
+    else if (ch === delim) { cur.push(field); field = ""; }
     else if (ch === "\n") { cur.push(field); field = ""; rows.push(cur); cur = []; }
     else if (ch !== "\r") field += ch;
   }
   if (field !== "" || cur.length) { cur.push(field); rows.push(cur); }
   return rows;
 }
+// détecte le séparateur (; , ou tabulation) à partir de l'en-tête
+function parseCsvSmart(text) {
+  const first = text.split(/\r?\n/)[0] || "";
+  for (const d of [";", ",", "\t"]) {
+    const heads = parseCsv(first, d)[0] || [];
+    if (heads.some(h => h.trim() === "Nom FR") && heads.some(h => h.trim() === "ID")) {
+      return { rows: parseCsv(text, d), delim: d };
+    }
+  }
+  return { rows: parseCsv(text, ";"), delim: ";" };
+}
 function csvDateToIso(s) {
   const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(s || "").trim());
   return m ? m[3] + "-" + m[2] + "-" + m[1] + "T00:00:00" : (s ? new Date(s).toISOString() : null);
 }
 function importCsv() {
-  const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".csv,text/csv";
-  inp.onchange = () => {
-    const f = inp.files[0]; if (!f) return;
-    const rd = new FileReader();
-    rd.onload = () => {
-      const rows = parseCsv(String(rd.result)).filter(r => r.some(v => v.trim() !== ""));
-      if (rows.length < 2) { toast("CSV vide ou illisible", true); return; }
-      const idx = {}; rows[0].forEach((h, i) => idx[h.trim()] = i);
-      if (idx["Nom FR"] == null || idx["ID"] == null) { toast("En-têtes invalides (attendus : Nom FR, ID…)", true); return; }
+  const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".csv,text/csv,text/plain";
+  inp.onchange = async () => {
+    const f = inp.files && inp.files[0];
+    if (!f) { toast("Aucun fichier sélectionné", true); return; }
+    try {
+      // lecture (f.text() moderne, sinon FileReader)
+      let text = "";
+      if (f.text) text = await f.text();
+      else text = await new Promise((res, rej) => {
+        const rd = new FileReader();
+        rd.onload = () => res(String(rd.result));
+        rd.onerror = () => rej(new Error("lecture impossible"));
+        rd.readAsText(f, "utf-8");
+      });
+      if (!text || !text.trim()) { toast("Le fichier est vide", true); return; }
+      const { rows, delim } = parseCsvSmart(text);
+      const clean = rows.filter(r => r.some(v => v.trim() !== ""));
+      if (clean.length < 2) { toast("CSV illisible ou sans données", true); return; }
+      const idx = {}; clean[0].forEach((h, i) => idx[h.trim()] = i);
+      if (idx["Nom FR"] == null || idx["ID"] == null) {
+        toast("En-têtes invalides — colonnes « Nom FR » et « ID » requises", true); return;
+      }
+      toast("Fichier lu : " + (clean.length - 1) + " ligne(s), séparateur « " + (delim === "\t" ? "tab" : delim) + " »");
       const get = (r, k) => idx[k] != null ? String(r[idx[k]] || "").trim() : "";
       // ATTENTION : écrasement total (confirmation intégrée, pas de confirm() natif)
       askConfirm(
         "⚠️ Import CSV",
-        "L'import va REMPLACER TOUTE la collection actuelle (" + ui.coll.length + " référence(s)) par les " + (rows.length - 1) + " ligne(s) du fichier.\n\nCette action est irréversible. Continuer ?",
+        "L'import va REMPLACER TOUTE la collection actuelle (" + ui.coll.length + " référence(s)) par les " + (clean.length - 1) + " ligne(s) du fichier.\n\nCette action est irréversible. Continuer ?",
         "Importer et remplacer",
         () => {
           const items = [];
           let skipped = 0;
-          for (const r of rows.slice(1)) {
+          for (const r of clean.slice(1)) {
             const name = get(r, "Nom FR"), id = get(r, "ID");
             if (!name || !id) { skipped++; continue; }
             const price = get(r, "Cote €");
@@ -492,8 +517,7 @@ function importCsv() {
           enrichImages();
         }
       );
-    };
-    rd.readAsText(f, "utf-8");
+    } catch (e) { toast("Erreur d'import : " + ((e && e.message) || e), true); }
   };
   inp.click();
 }
